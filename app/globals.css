@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens.
+ *
+ * Two independent axes on <html>:
+ *   data-theme  = dark | light                       (absent → follows the OS)
+ *   data-accent = cobalt | violet | crimson | emerald | graphite
+ *
+ * The live tokens are registered with @property so the browser interpolates
+ * them: an accent change melts across the whole page in 500 ms instead of
+ * hard-cutting. A mode change runs inside a view transition instead (see
+ * components/theme/ModeToggle.tsx), so token transitions are suspended while
+ * it captures its snapshots.
+ */
+
+@property --bg { syntax: "<color>"; inherits: true; initial-value: #0b0c0f; }
+@property --surface { syntax: "<color>"; inherits: true; initial-value: #14161b; }
+@property --surface-2 { syntax: "<color>"; inherits: true; initial-value: #1b1e24; }
+@property --line { syntax: "<color>"; inherits: true; initial-value: #2a2d35; }
+@property --fg { syntax: "<color>"; inherits: true; initial-value: #f2f0ea; }
+@property --muted { syntax: "<color>"; inherits: true; initial-value: #a3a9b5; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #6b93ff; }
+@property --accent-fg { syntax: "<color>"; inherits: true; initial-value: #0b0c0f; }
+
+/* ── Dark (default) ─────────────────────────────────────────────────────── */
+:root {
+  --bg: #0b0c0f;
+  --surface: #14161b;
+  --surface-2: #1b1e24;
+  --line: #2a2d35;
+  --fg: #f2f0ea;
+  --muted: #a3a9b5;
+  --accent-fg: #0b0c0f;
+
+  --a-cobalt: #6b93ff;
+  --a-violet: #a78bfa;
+  --a-crimson: #ff6b70;
+  --a-emerald: #2cc9a6;
+  --a-graphite: #e8e6e1;
+
+  --accent: var(--a-cobalt);
+  color-scheme: dark;
+
+  --token-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    --bg 500ms var(--token-ease),
+    --surface 500ms var(--token-ease),
+    --surface-2 500ms var(--token-ease),
+    --line 500ms var(--token-ease),
+    --fg 500ms var(--token-ease),
+    --muted 500ms var(--token-ease),
+    --accent 500ms var(--token-ease),
+    --accent-fg 500ms var(--token-ease);
+}
+
+/* ── Light ──────────────────────────────────────────────────────────────── */
+:root[data-theme="light"] {
+  --bg: #f2f0ea;
+  --surface: #e8e5dd;
+  --surface-2: #dedad0;
+  --line: #d2cec4;
+  --fg: #0b0c0f;
+  --muted: #4a4f59;
+  --accent-fg: #f7f6f2;
+
+  --a-cobalt: #2f5be0;
+  --a-violet: #6d3fe0;
+  --a-crimson: #c42a31;
+  --a-emerald: #0b7a65;
+  --a-graphite: #1c1d21;
+  color-scheme: light;
+}
+
+/* No stored choice and no JavaScript: follow the OS. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #f2f0ea;
+    --surface: #e8e5dd;
+    --surface-2: #dedad0;
+    --line: #d2cec4;
+    --fg: #0b0c0f;
+    --muted: #4a4f59;
+    --accent-fg: #f7f6f2;
+
+    --a-cobalt: #2f5be0;
+    --a-violet: #6d3fe0;
+    --a-crimson: #c42a31;
+    --a-emerald: #0b7a65;
+    --a-graphite: #1c1d21;
+    color-scheme: light;
+  }
+}
+
+/* ── Accents ────────────────────────────────────────────────────────────── */
+:root[data-accent="cobalt"] { --accent: var(--a-cobalt); }
+:root[data-accent="violet"] { --accent: var(--a-violet); }
+:root[data-accent="crimson"] { --accent: var(--a-crimson); }
+:root[data-accent="emerald"] { --accent: var(--a-emerald); }
+:root[data-accent="graphite"] { --accent: var(--a-graphite); }
+
+/* A mode switch is animated by the view transition, not by the tokens. */
+:root[data-switching] { transition: none; }
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: color-mix(in oklch, var(--accent) 14%, var(--bg));
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+@theme {
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+/* ── View transition for the mode switch ───────────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { transition: none; }
+
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
