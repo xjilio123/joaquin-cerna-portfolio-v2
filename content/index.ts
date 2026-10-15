@@ -42,7 +42,7 @@ export const stats: Stat[] = [
     id: "roles",
     value: experience.length,
     label: { es: "Roles profesionales", en: "Professional roles" },
-    note: { es: "Analytics, QA y soporte TI", en: "Analytics, QA and IT support" },
+    note: { es: "Data & IA, analytics, QA y soporte TI", en: "Data & AI, analytics, QA and IT support" },
   },
   {
     id: "certifications",

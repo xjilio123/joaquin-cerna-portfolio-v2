@@ -3,6 +3,39 @@ import type { ExperienceEntry } from "./types";
 /** Ordered newest first. `start` exists purely to keep that ordering explicit. */
 export const experience: ExperienceEntry[] = [
   {
+    id: "prediqt",
+    company: "PREDIQT",
+    role: {
+      es: "Practicante Profesional de Data Analytics e IA — Cloud & Analytics",
+      en: "Data Analytics & AI Professional Intern — Cloud & Analytics",
+    },
+    period: { es: "Agosto 2026 — Actualidad", en: "August 2026 — Present" },
+    start: "2026-08-20",
+    bullets: [
+      {
+        es: "Apoyo en la extracción, transformación y análisis de datos junto a consultores senior.",
+        en: "Support data extraction, transformation and analysis alongside senior consultants.",
+      },
+      {
+        es: "Colaboro en la elaboración de reportes y visualizaciones.",
+        en: "Help build reports and visualizations.",
+      },
+      {
+        es: "Participo en iniciativas de IA generativa y automatización.",
+        en: "Take part in generative AI and automation initiatives.",
+      },
+      {
+        es: "Apoyo en proyectos desarrollados sobre plataformas cloud.",
+        en: "Support projects built on cloud platforms.",
+      },
+      {
+        es: "Investigo nuevas herramientas y tendencias de Data & Analytics y Agentic AI.",
+        en: "Research new tools and trends in Data & Analytics and Agentic AI.",
+      },
+    ],
+    stack: ["SQL", "Python", "IA generativa", "Agentic AI", "Cloud"],
+  },
+  {
     id: "usmp-derecho",
     company: "Facultad de Derecho — USMP",
     role: {
