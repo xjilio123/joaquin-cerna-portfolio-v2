@@ -37,9 +37,15 @@ export const profile = {
     en: "Analytics, Business Intelligence and automation — from the ETL process to the dashboard someone actually decides with.",
   } satisfies LocalizedString,
 
+  /** Opening statement of the About section, set large. */
+  bioLead: {
+    es: "Egresado de Ingeniería de Computación y Sistemas, hoy en Data Analytics e IA en PREDIQT.",
+    en: "Computer & Systems Engineering graduate, now working in Data Analytics & AI at PREDIQT.",
+  } satisfies LocalizedString,
+
   bio: {
-    es: "Egresado de Ingeniería de Computación y Sistemas (2026-1) con enfoque profesional en Data Analytics, Business Intelligence y automatización de procesos. Experiencia en procesos ETL, limpieza y transformación de datos, modelado dimensional y diseño de dashboards interactivos. Manejo avanzado de SQL, Power BI y Excel para análisis de datos y visualización de KPIs. Conocimiento en Python para análisis exploratorio de datos (EDA) y automatización. Experiencia trabajando bajo metodología Scrum y control de versiones con GitHub.",
-    en: "Computer & Systems Engineering graduate (2026-1) focused on Data Analytics, Business Intelligence and process automation. Experienced in ETL processes, data cleaning and transformation, dimensional modeling and interactive dashboard design. Advanced command of SQL, Power BI and Excel for data analysis and KPI visualization. Working knowledge of Python for exploratory data analysis (EDA) and automation. Experience with Scrum methodology and version control using GitHub.",
+    es: "Mi enfoque es Data Analytics, Business Intelligence y automatización de procesos. Tengo experiencia en procesos ETL, limpieza y transformación de datos, modelado dimensional y diseño de dashboards interactivos. Manejo SQL, Power BI y Excel a nivel avanzado para análisis y visualización de KPIs, y Python para análisis exploratorio (EDA) y automatización. Trabajo con Scrum y control de versiones en GitHub.",
+    en: "My focus is Data Analytics, Business Intelligence and process automation. I have hands-on experience with ETL processes, data cleaning and transformation, dimensional modeling and interactive dashboard design. I use SQL, Power BI and Excel at an advanced level for analysis and KPI visualization, and Python for exploratory data analysis (EDA) and automation. I work with Scrum and version control on GitHub.",
   } satisfies LocalizedString,
 
   /** Condensed version used for metadata and the OG image. */

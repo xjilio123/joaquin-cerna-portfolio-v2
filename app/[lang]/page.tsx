@@ -4,9 +4,16 @@ import { CommandPalette } from "@/components/command/CommandPalette";
 import { Preloader } from "@/components/intro/Preloader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { About } from "@/components/sections/About";
+import { Certifications } from "@/components/sections/Certifications";
+import { Contact } from "@/components/sections/Contact";
+import { CvSection } from "@/components/sections/CvSection";
+import { Experience } from "@/components/sections/Experience";
 import { Hero } from "@/components/sections/Hero";
-import { SectionStub } from "@/components/sections/SectionStub";
-import { SECTIONS, isLocale, tr } from "@/lib/i18n";
+import { Projects } from "@/components/sections/Projects";
+import { Skills } from "@/components/sections/Skills";
+import { RevealObserver } from "@/components/ui/RevealObserver";
+import { isLocale, tr } from "@/lib/i18n";
 
 export default async function HomePage() {
   const locale = await lang();
@@ -24,18 +31,17 @@ export default async function HomePage() {
       <SiteHeader lang={locale} />
       <main id="main">
         <Hero lang={locale} />
-        {SECTIONS.map((section, index) => (
-          <SectionStub
-            key={section.id}
-            id={section.id}
-            index={index + 1}
-            label={section.label}
-            lang={locale}
-          />
-        ))}
+        <About lang={locale} index={1} />
+        <Skills lang={locale} index={2} />
+        <Experience lang={locale} index={3} />
+        <Certifications lang={locale} index={4} />
+        <Projects lang={locale} index={5} />
+        <CvSection lang={locale} index={6} />
+        <Contact lang={locale} index={7} />
       </main>
       <SiteFooter lang={locale} />
       <CommandPalette lang={locale} />
+      <RevealObserver />
     </>
   );
 }

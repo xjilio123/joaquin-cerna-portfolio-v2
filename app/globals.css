@@ -211,6 +211,55 @@ html[data-ready] .reveal {
   to { opacity: 1; transform: none; }
 }
 
+/* Section content: revealed as it scrolls into view (see RevealObserver). */
+[data-reveal] {
+  transition:
+    opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html[data-observing] [data-reveal]:not([data-shown]) {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+/* Looping micro-visuals only run once their card has been revealed. */
+html[data-observing] .loop {
+  animation-play-state: paused;
+}
+
+html[data-observing] [data-shown] .loop,
+html[data-observing] [data-shown].loop {
+  animation-play-state: running;
+}
+
+@keyframes bar-grow {
+  0%, 12% { transform: scaleY(0.15); }
+  45%, 85% { transform: scaleY(1); }
+  100% { transform: scaleY(0.15); }
+}
+
+@keyframes cell-fill {
+  0%, 20% { background-color: transparent; }
+  35%, 85% { background-color: color-mix(in oklch, var(--accent) 45%, transparent); }
+  100% { background-color: transparent; }
+}
+
+@keyframes type-line {
+  0% { clip-path: inset(0 100% 0 0); }
+  30%, 90% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 100% 0 0); }
+}
+
+@keyframes caret {
+  50% { opacity: 0; }
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
 /* ── Preloader ─────────────────────────────────────────────────────────── */
 .preloader {
   display: none;
@@ -241,6 +290,11 @@ html[data-intro="pending"] .preloader {
     color: var(--fg);
     padding: 0;
     border: 0;
+  }
+
+  /* The dialog receives focus programmatically; its controls keep their own rings. */
+  dialog.sheet:focus-visible {
+    outline: none;
   }
 }
 
@@ -280,9 +334,14 @@ dialog[open] .menu-link {
 
   .hero-char,
   .reveal,
-  .menu-link {
+  .menu-link,
+  [data-reveal] {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .loop {
+    animation: none !important;
   }
 
   html { scroll-behavior: auto; }
