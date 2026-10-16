@@ -104,8 +104,10 @@ export function SiteHeader({ lang }: { lang: Lang }) {
         }`}
         onFocusCapture={() => setHidden(false)}
       >
+        {/* No prefetch: it points at the page that is already open. */}
         <Link
           href={`/${lang}`}
+          prefetch={false}
           aria-label={`JCR — ${tr("nav.home", lang)}`}
           className={`${pill} ${height} ${raised} grid place-items-center px-5 font-mono text-sm font-semibold tracking-wider text-fg hover:text-accent`}
         >

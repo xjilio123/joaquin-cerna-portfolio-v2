@@ -83,7 +83,14 @@ export function PortraitDots({ src, alt, sizes }: { src: string; alt: string; si
     let releaseTimer: ReturnType<typeof setTimeout> | undefined;
 
     /** Luminance → 0..1, with the backdrop at 0 and the brightest skin near 1. */
-    function readLevels(image: HTMLImageElement) {
+    // The photo is fetched and turned into dots only when the card comes near
+    // the screen, in idle time and in short steps, so none of it competes with
+    // the page load or with scrolling.
+    const idle = (task: () => void) =>
+      "requestIdleCallback" in window ? requestIdleCallback(task, { timeout: 600 }) : setTimeout(task, 1);
+    const pause = () => new Promise<void>((resolve) => idle(resolve));
+
+    async function readLevels(image: HTMLImageElement) {
       const sample = document.createElement("canvas");
       sample.width = SAMPLE_W;
       sample.height = SAMPLE_H;
@@ -106,17 +113,31 @@ export function PortraitDots({ src, alt, sizes }: { src: string; alt: string; si
         return sum / 144;
       };
       const backdrop = Math.min(corner(0), corner(SAMPLE_W - 12)) + 7;
+      await pause();
       // Edge boost: base + k·(base − blur), a box blur of radius 4 run both ways.
       const blur = boxBlur(base, SAMPLE_W, SAMPLE_H, 4);
+      await pause();
       const lum = new Float32Array(base.length);
-      const person: number[] = [];
+      // Levels from the person's own range (2nd–99.5th percentile), so dark and
+      // bright photos both fill the scale. A histogram is enough for percentiles.
+      const OFFSET = 512;
+      const histogram = new Uint32Array(1536);
+      let count = 0;
       for (let i = 0; i < lum.length; i++) {
         lum[i] = base[i] + SHARPEN * (base[i] - blur[i]);
-        if (base[i] > backdrop) person.push(lum[i]);
+        if (base[i] > backdrop) {
+          histogram[Math.min(1535, Math.max(0, Math.round(lum[i]) + OFFSET))]++;
+          count++;
+        }
       }
-      // Levels from the person's own range (2nd–99.5th percentile), so dark and bright photos both fill the scale.
-      person.sort((a, b) => a - b);
-      const at = (q: number) => person[Math.min(person.length - 1, Math.floor(person.length * q))] ?? 0;
+      const at = (q: number) => {
+        let seen = 0;
+        for (let v = 0; v < histogram.length; v++) {
+          seen += histogram[v];
+          if (seen > count * q) return v - OFFSET;
+        }
+        return 255;
+      };
       const low = at(0.02);
       const span = Math.max(1, at(0.995) - low);
       for (let i = 0; i < lum.length; i++) {
@@ -225,12 +246,22 @@ export function PortraitDots({ src, alt, sizes }: { src: string; alt: string; si
 
     const image = new window.Image();
     image.decoding = "async";
-    image.onload = () => {
-      if (disposed) return;
-      levels = readLevels(image);
-      layout();
-    };
-    image.src = src;
+    image.onload = () =>
+      idle(async () => {
+        const read = await readLevels(image);
+        if (disposed) return;
+        levels = read;
+        layout();
+      });
+    const nearby = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        nearby.disconnect();
+        image.src = src;
+      },
+      { rootMargin: "400px 0px" },
+    );
+    nearby.observe(wrap);
 
     const visibility = new IntersectionObserver(
       ([entry]) => {
@@ -280,6 +311,7 @@ export function PortraitDots({ src, alt, sizes }: { src: string; alt: string; si
       cancelAnimationFrame(frame);
       clearTimeout(releaseTimer);
       visibility.disconnect();
+      nearby.disconnect();
       resize.disconnect();
       recolor.disconnect();
       wrap.removeEventListener("pointermove", onMove);

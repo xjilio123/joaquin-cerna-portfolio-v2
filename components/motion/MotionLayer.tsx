@@ -17,6 +17,9 @@ import { setLenis } from "@/lib/scroll";
  *
  * Nothing runs with reduced motion; the static page is complete without it.
  */
+/** Lets the browser handle input and paint before the next setup step. */
+const yieldToMain = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
 export function MotionLayer() {
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -59,7 +62,11 @@ export function MotionLayer() {
         });
       }
 
-      const context = gsap.context(() => {
+      // Set up in three short tasks rather than one long one, so the page can
+      // answer taps in between (each step yields back to the browser).
+      const context = gsap.context(() => {});
+      cleanups.push(() => context.revert());
+      context.add(() => {
         // 2 ── Words that light up
         gsap.utils.toArray<HTMLElement>("[data-scrub]").forEach((paragraph) => {
           gsap.fromTo(
@@ -74,6 +81,10 @@ export function MotionLayer() {
           );
         });
 
+      });
+      await yieldToMain();
+      if (disposed) return;
+      context.add(() => {
         // 2b ── Section titles fill in, accent lines draw across section edges
         gsap.utils.toArray<HTMLElement>("[data-fill]").forEach((title) => {
           gsap.fromTo(
@@ -90,6 +101,10 @@ export function MotionLayer() {
           );
         });
 
+      });
+      await yieldToMain();
+      if (disposed) return;
+      context.add(() => {
         // Pins are created in page order (Método comes before Experiencia) so
         // each one measures its start after the spacer of the one above.
         const media = gsap.matchMedia();
@@ -168,7 +183,8 @@ export function MotionLayer() {
           });
         });
       });
-      cleanups.push(() => context.revert());
+      await yieldToMain();
+      if (disposed) return;
 
       // 4 ── Counters
       const counters = document.querySelectorAll<HTMLElement>("[data-count]");

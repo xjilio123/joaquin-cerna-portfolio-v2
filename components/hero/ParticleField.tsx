@@ -276,13 +276,22 @@ export function ParticleField() {
       const chars = heading ? Array.from(heading.querySelectorAll<HTMLElement>(".hero-char")) : [];
       const c = canvas.getBoundingClientRect();
       if (!heading || !chars.length || c.width < 1 || c.height < 1) return false;
-      const off = document.createElement("canvas");
-      off.width = Math.ceil(c.width);
-      off.height = Math.ceil(c.height);
-      const ctx = off.getContext("2d", { willReadFrequently: true });
-      if (!ctx) return false;
+      // Only the heading's own box is drawn and read back, not the whole hero,
+      // padded because the tight line-height lets glyphs overflow the box.
       const style = getComputedStyle(heading);
       const size = parseFloat(style.fontSize);
+      const pad = Math.ceil(size * 0.35);
+      const h = heading.getBoundingClientRect();
+      const ox = Math.max(0, Math.floor(h.left - c.left) - pad);
+      const oy = Math.max(0, Math.floor(h.top - c.top) - pad);
+      const ow = Math.min(Math.ceil(c.width) - ox, Math.ceil(h.width) + pad * 2);
+      const oh = Math.min(Math.ceil(c.height) - oy, Math.ceil(h.height) + pad * 2);
+      if (ow < 1 || oh < 1) return false;
+      const off = document.createElement("canvas");
+      off.width = ow;
+      off.height = oh;
+      const ctx = off.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return false;
       ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
       ctx.textBaseline = "alphabetic";
       ctx.fillStyle = "#fff";
@@ -291,15 +300,17 @@ export function ParticleField() {
       const descent = metrics.fontBoundingBoxDescent || size * 0.2;
       for (const char of chars) {
         const r = char.getBoundingClientRect();
-        const baseline = r.top - c.top + (r.height - (ascent + descent)) / 2 + ascent;
-        ctx.fillText(char.textContent ?? "", r.left - c.left, baseline);
+        const baseline = r.top - c.top - oy + (r.height - (ascent + descent)) / 2 + ascent;
+        ctx.fillText(char.textContent ?? "", r.left - c.left - ox, baseline);
       }
-      const { data, width, height } = ctx.getImageData(0, 0, off.width, off.height);
+      const { data } = ctx.getImageData(0, 0, ow, oh);
+      const width = Math.ceil(c.width);
+      const height = Math.ceil(c.height);
       const step = 3;
       const points: number[] = [];
-      for (let y = 0; y < height; y += step) {
-        for (let x = 0; x < width; x += step) {
-          if (data[(y * width + x) * 4 + 3] > 140) points.push(x / width, y / height);
+      for (let y = 0; y < oh; y += step) {
+        for (let x = 0; x < ow; x += step) {
+          if (data[(y * ow + x) * 4 + 3] > 140) points.push((x + ox) / width, (y + oy) / height);
         }
       }
       const total = points.length / 2;
