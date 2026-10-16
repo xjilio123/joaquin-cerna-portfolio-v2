@@ -31,11 +31,17 @@ export function CopyEmailButton({ lang }: { lang: Lang }) {
   );
 }
 
-/** The number is assembled only on request, so it is never one scrapeable string. */
+/** Decodes the phone stored in content/profile.ts: base64 → digits reversed back → "999 999 999". */
+function decodePhone(encoded: string) {
+  const digits = [...atob(encoded)].reverse().join("");
+  return digits.replace(/(\d{3})(?=\d)/g, "$1 ");
+}
+
+/** The number is decoded only on request, so it is never a scrapeable string. */
 export function RevealPhone({ lang }: { lang: Lang }) {
   const [shown, setShown] = useState(false);
   if (shown) {
-    const full = `${profile.phone.country} ${profile.phone.body}`;
+    const full = `${profile.phone.country} ${decodePhone(profile.phone.encoded)}`;
     return (
       <a href={`tel:${full.replace(/\s/g, "")}`} className="font-display text-xl font-semibold tracking-tight text-fg sm:text-2xl">
         {full}

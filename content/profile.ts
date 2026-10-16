@@ -16,8 +16,12 @@ export const profile = {
     en: "Lima, Peru",
   } satisfies LocalizedString,
   email: "joaquin200314@gmail.com",
-  /** Split so the number is never one scrapeable string in the markup. */
-  phone: { country: "+51", body: "939 936 706" },
+  /**
+   * Encoded (reversed digits, base64) so the number is never plain text in the
+   * page or its JavaScript. It only stops simple scrapers: anyone who presses
+   * "Mostrar número" sees it, which is the point.
+   */
+  phone: { country: "+51", encoded: "NjA3NjM5OTM5" },
   linkedin: "https://www.linkedin.com/in/joaquincernarojas14",
   linkedinLabel: "linkedin.com/in/joaquincernarojas14",
 
