@@ -16,8 +16,8 @@ import { useEffect, useRef, useState } from "react";
 
 const SAMPLE_W = 225; // sampling resolution, 3:4 like the card
 const SAMPLE_H = 300;
-const SHARPEN = 2; // edge boost, so glasses and features survive the halftone
-const MIN_LEVEL = 0.24;
+const SHARPEN = 1.2; // edge boost, so glasses and features survive the halftone
+const MIN_LEVEL = 0.18;
 const PUSH_RADIUS = 72;
 
 /** The card is dark in both themes, so the dots always take the dark-theme accent. */
@@ -95,37 +95,33 @@ export function PortraitDots({ src, alt, sizes }: { src: string; alt: string; si
       const dh = image.naturalHeight * scale;
       sctx.drawImage(image, (SAMPLE_W - dw) / 2, (SAMPLE_H - dh) / 2, dw, dh);
       const { data } = sctx.getImageData(0, 0, SAMPLE_W, SAMPLE_H);
-      const lum = new Float32Array(SAMPLE_W * SAMPLE_H);
-      for (let i = 0; i < lum.length; i++) {
-        const l = 0.2126 * data[i * 4] + 0.7152 * data[i * 4 + 1] + 0.0722 * data[i * 4 + 2];
-        lum[i] = l;
-      }
-      // Edge boost: lum + k·(lum − blur), a box blur of radius 4 run both ways.
-      const blur = boxBlur(lum, SAMPLE_W, SAMPLE_H, 4);
-      for (let i = 0; i < lum.length; i++) lum[i] += SHARPEN * (lum[i] - blur[i]);
-      // Floor: the darkest corner (the backdrop). Ceiling: the 99.9th percentile.
-      const corner = (x0: number, y0: number) => {
+      // "Red filter" mix, as in black-and-white portraits: skin reads light,
+      // greens and blues (clothes, walls) read darker, so the face leads.
+      const base = new Float32Array(SAMPLE_W * SAMPLE_H);
+      for (let i = 0; i < base.length; i++) base[i] = 0.65 * data[i * 4] + 0.315 * data[i * 4 + 1] + 0.035 * data[i * 4 + 2];
+      // Backdrop: the darker top corner. Anything clearly above it is the person.
+      const corner = (x0: number) => {
         let sum = 0;
-        for (let y = y0; y < y0 + 12; y++) for (let x = x0; x < x0 + 12; x++) sum += lum[y * SAMPLE_W + x];
+        for (let y = 0; y < 12; y++) for (let x = x0; x < x0 + 12; x++) sum += base[y * SAMPLE_W + x];
         return sum / 144;
       };
-      const floor = Math.min(corner(0, 0), corner(SAMPLE_W - 12, 0)) + 3;
-      const histogram = new Uint32Array(256);
-      for (const l of lum) histogram[Math.min(255, Math.max(0, Math.round(l)))]++;
-      let seen = 0;
-      let ceiling = 255;
-      for (let v = 0; v < 256; v++) {
-        seen += histogram[v];
-        if (seen >= lum.length * 0.999) {
-          ceiling = v;
-          break;
-        }
-      }
-      const span = Math.max(1, ceiling - floor);
-      // Anything above the backdrop keeps a minimum dot, so dark hair and clothes still draw the silhouette.
+      const backdrop = Math.min(corner(0), corner(SAMPLE_W - 12)) + 7;
+      // Edge boost: base + k·(base − blur), a box blur of radius 4 run both ways.
+      const blur = boxBlur(base, SAMPLE_W, SAMPLE_H, 4);
+      const lum = new Float32Array(base.length);
+      const person: number[] = [];
       for (let i = 0; i < lum.length; i++) {
-        const v = Math.pow(Math.min(1, Math.max(0, (lum[i] - floor) / span)), 0.75);
-        lum[i] = lum[i] > floor + 4 ? Math.max(v, MIN_LEVEL) : v;
+        lum[i] = base[i] + SHARPEN * (base[i] - blur[i]);
+        if (base[i] > backdrop) person.push(lum[i]);
+      }
+      // Levels from the person's own range (2nd–99.5th percentile), so dark and bright photos both fill the scale.
+      person.sort((a, b) => a - b);
+      const at = (q: number) => person[Math.min(person.length - 1, Math.floor(person.length * q))] ?? 0;
+      const low = at(0.02);
+      const span = Math.max(1, at(0.995) - low);
+      for (let i = 0; i < lum.length; i++) {
+        // The person always keeps a minimum dot, so dark hair and clothes still draw the silhouette.
+        lum[i] = base[i] > backdrop ? Math.max(MIN_LEVEL, Math.min(1, Math.max(0, (lum[i] - low) / span))) : 0;
       }
       return lum;
     }
