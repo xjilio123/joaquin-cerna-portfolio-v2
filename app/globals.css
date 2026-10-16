@@ -177,8 +177,15 @@ html.lenis {
   scroll-behavior: auto;
 }
 
+/* Stopped while a dialog is open. The scrollbar's space stays reserved
+   (scrollbar-gutter), so pausing the scroll never changes the page width:
+   no relayout of the whole page behind the dialog, no sideways jump. */
+html.lenis {
+  scrollbar-gutter: stable;
+}
+
 .lenis.lenis-stopped {
-  overflow: clip;
+  overflow: hidden;
 }
 
 .lenis [data-lenis-prevent] {
@@ -411,6 +418,26 @@ dialog.sheet[open] {
 
 dialog.sheet[open]::backdrop {
   animation: fade-in 320ms ease-out;
+}
+
+/* Command palette: a non-modal dialog that covers the screen and draws its
+   own backdrop (see CommandPalette for why it is not modal). */
+dialog.palette {
+  border: 0;
+  background: color-mix(in oklch, var(--bg) 60%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+dialog.palette:focus-visible {
+  outline: none;
+}
+
+dialog.palette[open] {
+  animation: fade-in 240ms ease-out;
+}
+
+dialog.palette[open] .palette-panel {
+  animation: sheet-in 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes sheet-in {

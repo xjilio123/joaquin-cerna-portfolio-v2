@@ -14,7 +14,8 @@ export const setLenis = (lenis: Lenis | null) => {
 export function scrollToId(id: string) {
   const target = document.getElementById(id);
   if (!target) return;
-  if (instance) instance.scrollTo(target, { offset: id === "top" ? 0 : -16 });
+  // force: an explicit jump must happen even if a dialog paused the smooth scroll.
+  if (instance) instance.scrollTo(target, { offset: id === "top" ? 0 : -16, force: true });
   else target.scrollIntoView({ behavior: "smooth" });
   history.replaceState(null, "", `#${id}`);
 }

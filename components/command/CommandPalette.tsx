@@ -35,8 +35,14 @@ const Swatch = ({ name }: { name: string }) => (
 
 /**
  * Ctrl/⌘ + K palette: jump to a section, change mode, colour or language,
- * download the CV, copy the email. A native modal <dialog> handles focus and
- * Escape; the list follows the ARIA combobox + listbox pattern.
+ * download the CV, copy the email. The list follows the ARIA combobox +
+ * listbox pattern.
+ *
+ * The <dialog> opens with show(), not showModal(): a modal dialog makes the
+ * rest of the document inert, and on this page that restyles ~1,600 elements
+ * at once — a visible hitch on every open. Here the dialog covers the screen
+ * itself (its own blurred backdrop) and handles Escape and Tab, which is all
+ * the modal mode was giving us; aria-modal keeps the semantics for screen readers.
  */
 export function CommandPalette({ lang }: { lang: Lang }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -129,7 +135,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
     const open = () => {
       const dialog = dialogRef.current;
       if (!dialog || dialog.open) return;
-      dialog.showModal();
+      dialog.show();
       inputRef.current?.focus();
     };
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
@@ -141,9 +147,25 @@ export function CommandPalette({ lang }: { lang: Lang }) {
     };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener(COMMAND_EVENT, open);
+
+    // Warm-up, once, in idle time: lay the closed palette out invisibly so the
+    // first real open does not pay for shaping its text (the ↑↓ ↵ glyphs need
+    // a fallback-font lookup). It never opens, so nothing else reacts.
+    const warm = () => {
+      const dialog = dialogRef.current;
+      if (!dialog || dialog.open) return;
+      dialog.style.cssText = "display:block;visibility:hidden";
+      dialog.getBoundingClientRect();
+      dialog.style.cssText = "";
+    };
+    const hasIdle = typeof requestIdleCallback === "function";
+    const idle = hasIdle ? requestIdleCallback(warm, { timeout: 4000 }) : setTimeout(warm, 2000);
+
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener(COMMAND_EVENT, open);
+      if (hasIdle) cancelIdleCallback(idle as number);
+      else clearTimeout(idle);
     };
   }, []);
 
@@ -161,11 +183,19 @@ export function CommandPalette({ lang }: { lang: Lang }) {
         });
       return;
     }
-    command.run();
+    // Close first, run on the next frame: while the palette is open the smooth
+    // scroll is paused and would ignore a jump to a section.
     dialogRef.current?.close();
+    const run = command.run;
+    requestAnimationFrame(() => run());
   };
 
   const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    // The input is the palette's only focus stop: Tab stays here.
+    if (event.key === "Tab") {
+      event.preventDefault();
+      return;
+    }
     if (!results.length) return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
@@ -191,8 +221,15 @@ export function CommandPalette({ lang }: { lang: Lang }) {
     <dialog
       ref={dialogRef}
       aria-label={tr("cmd.title", lang)}
+      aria-modal="true"
       data-lenis-prevent
-      className="sheet mx-auto mt-[12vh] w-[min(92vw,600px)]"
+      className="palette fixed inset-0 z-[85] m-0 h-dvh max-h-none w-full max-w-none p-0 text-fg"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          dialogRef.current?.close();
+        }
+      }}
       onClose={() => {
         setQuery("");
         setActiveIndex(0);
@@ -202,7 +239,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
         if (event.target === event.currentTarget) dialogRef.current?.close();
       }}
     >
-      <div className="overflow-hidden rounded-3xl border border-line bg-surface shadow-2xl shadow-black/30">
+      <div className="palette-panel mx-auto mt-[12vh] w-[min(92vw,600px)] overflow-hidden rounded-3xl border border-line bg-surface shadow-2xl shadow-black/30">
         <div className="flex items-center gap-3 border-b border-line px-5">
           <svg aria-hidden viewBox="0 0 20 20" className="size-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
             <circle cx="9" cy="9" r="5.5" />
@@ -229,7 +266,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
           <kbd className="hidden rounded-md border border-line px-1.5 py-0.5 font-mono text-[11px] text-muted sm:block">Esc</kbd>
         </div>
 
-        <ul id={listId} role="listbox" aria-label={tr("cmd.title", lang)} className="max-h-[min(60vh,420px)] overflow-y-auto p-2">
+        <ul id={listId} role="listbox" aria-label={tr("cmd.title", lang)} className="max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain p-2 [scrollbar-color:var(--line)_transparent] [scrollbar-width:thin]">
           {results.length === 0 ? (
             <li role="presentation" className="px-3 py-8 text-center text-sm text-muted">
               {tr("cmd.empty", lang)}

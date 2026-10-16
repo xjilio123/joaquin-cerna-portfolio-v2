@@ -500,8 +500,12 @@ export function ParticleField() {
       frame = requestAnimationFrame(render);
     };
 
+    // A modal dialog (search, mobile menu) covers the hero with a blurred
+    // backdrop: pause meanwhile, so the blur is not recomputed every frame.
+    const modalOpen = () => document.querySelector("dialog[open]") !== null;
+
     const startLoop = () => {
-      if (running || !onScreen || document.hidden) return;
+      if (running || !onScreen || document.hidden || modalOpen()) return;
       running = true;
       frame = requestAnimationFrame(render);
     };
@@ -520,6 +524,9 @@ export function ParticleField() {
     const onVisibility = () => (document.hidden ? stopLoop() : startLoop());
     document.addEventListener("visibilitychange", onVisibility);
 
+    const dialogs = new MutationObserver(() => (modalOpen() ? stopLoop() : startLoop()));
+    dialogs.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["open"] });
+
     startLoop();
 
     return () => {
@@ -534,6 +541,7 @@ export function ParticleField() {
       window.removeEventListener("pointermove", onPointerMove);
       document.documentElement.removeEventListener("pointerleave", onPointerLeave);
       document.removeEventListener("visibilitychange", onVisibility);
+      dialogs.disconnect();
       // The context is not force-lost here: if React shows this canvas again
       // (hidden-then-visible Activity), the same context must still work.
     };
