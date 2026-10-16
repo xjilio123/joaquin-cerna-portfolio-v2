@@ -2,6 +2,7 @@
 
 import { useLayoutEffect } from "react";
 import { applyStoredPreferences } from "@/lib/preferences";
+import { markPageMounted } from "./use-theme-state";
 
 /**
  * Re-applies the visitor's mode and accent when the root layout mounts.
@@ -11,6 +12,7 @@ import { applyStoredPreferences } from "@/lib/preferences";
 export function PreferencesSync() {
   useLayoutEffect(() => {
     applyStoredPreferences();
+    markPageMounted();
   }, []);
   return null;
 }

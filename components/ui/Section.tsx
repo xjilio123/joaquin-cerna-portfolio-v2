@@ -28,9 +28,11 @@ export function Section({
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className={`scroll-mt-20 border-t border-line px-5 py-24 sm:px-8 lg:px-16 lg:py-36 ${className}`}
+      className={`relative scroll-mt-20 border-t border-line px-5 py-24 sm:px-8 lg:px-16 lg:py-36 ${className}`}
       {...rest}
     >
+      {/* Accent line drawn across the section edge as it scrolls in (MotionLayer). */}
+      <span aria-hidden data-wipe className="absolute inset-x-0 -top-px hidden h-px origin-left scale-x-0 bg-accent fx:block" />
       <header data-reveal className={`grid gap-5 lg:grid-cols-12 ${headerClassName}`}>
         <p data-scramble className="font-mono text-xs uppercase tracking-[0.25em] text-accent sm:text-sm lg:col-span-3 lg:pt-4">
           {String(index).padStart(2, "0")} / {eyebrow}
@@ -39,6 +41,7 @@ export function Section({
           <h2
             id={`${id}-title`}
             data-scramble
+            data-fill
             className="font-display text-[clamp(2.75rem,6.5vw,6rem)] font-bold leading-[0.95] tracking-[-0.04em] text-fg"
           >
             {title}

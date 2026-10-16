@@ -72,12 +72,15 @@ export function applyIntroState() {
   try {
     seen = sessionStorage.getItem(INTRO_STORAGE_KEY) === "1";
   } catch {}
-  if (seen || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (seen || reduced) {
     root.setAttribute("data-intro", "done");
     root.setAttribute("data-ready", "");
   } else {
     root.setAttribute("data-intro", "pending");
   }
+  // The hero name is written by particles first (never with reduced motion).
+  if (!reduced) root.setAttribute("data-hero-intro", "");
 }
 
 /** The same logic as applyStoredPreferences, as a string for <head>. Keep in sync. */
@@ -89,4 +92,4 @@ export const PREPAINT_SCRIPT = `(function(){var d=document.documentElement;try{v
   DEFAULT_ACCENT,
 )}}d.setAttribute("data-accent",a)}catch(e){}var s=false;try{s=sessionStorage.getItem(${JSON.stringify(
   INTRO_STORAGE_KEY,
-)})==="1"}catch(e){}if(s||matchMedia("(prefers-reduced-motion: reduce)").matches){d.setAttribute("data-intro","done");d.setAttribute("data-ready","")}else{d.setAttribute("data-intro","pending")}})();`;
+)})==="1"}catch(e){}var r=matchMedia("(prefers-reduced-motion: reduce)").matches;if(s||r){d.setAttribute("data-intro","done");d.setAttribute("data-ready","")}else{d.setAttribute("data-intro","pending")}if(!r)d.setAttribute("data-hero-intro","")})();`;

@@ -154,6 +154,7 @@ export function CertificationGallery({ lang }: { lang: Lang }) {
                 <button
                   type="button"
                   data-tilt
+                  data-cursor={tr("cursor.view", lang)}
                   onClick={() => show(certification)}
                   className="group flex size-full flex-col overflow-hidden rounded-3xl border border-line bg-surface text-left transition-[border-color,translate] duration-500 ease-out-expo hover:-translate-y-1 hover:border-accent/60"
                 >

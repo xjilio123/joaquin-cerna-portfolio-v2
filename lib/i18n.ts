@@ -167,6 +167,11 @@ export const ui = {
   "contact.openLinkedin": { es: "Abrir perfil", en: "Open profile" },
   "contact.write": { es: "Escribir un correo", en: "Send an email" },
 
+  "cursor.view": { es: "Ver", en: "View" },
+  "cursor.open": { es: "Abrir", en: "Open" },
+  "cursor.download": { es: "Bajar", en: "Get" },
+  "cursor.copy": { es: "Copiar", en: "Copy" },
+
   "footer.rights": { es: "Todos los derechos reservados.", en: "All rights reserved." },
   "footer.backToTop": { es: "Volver arriba", en: "Back to top" },
   "footer.built": { es: "Hecho con Next.js y WebGL", en: "Built with Next.js and WebGL" },

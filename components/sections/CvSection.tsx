@@ -20,6 +20,7 @@ export function CvSection({ lang, index }: { lang: Lang; index: number }) {
               <a
                 href={profile.cvPath}
                 download={profile.cvFileName}
+                data-cursor={tr("cursor.download", lang)}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-accent-fg"
               >
                 {tr("cv.download", lang)}
@@ -48,6 +49,7 @@ export function CvSection({ lang, index }: { lang: Lang; index: number }) {
             rel="noreferrer"
             aria-label={tr("cv.openInTab", lang)}
             data-tilt="strong"
+            data-cursor={tr("cursor.open", lang)}
             className="group relative mx-auto block w-full max-w-xl"
           >
             <div className="relative aspect-[1100/1556] w-[78%] translate-x-[22%] rotate-[5deg] overflow-hidden rounded-2xl border border-line bg-white shadow-2xl shadow-black/25 transition-transform duration-700 ease-out-expo group-hover:translate-x-[26%] group-hover:rotate-[7deg]">

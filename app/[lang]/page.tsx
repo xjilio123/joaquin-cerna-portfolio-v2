@@ -81,6 +81,8 @@ export default async function HomePage() {
       <MotionLayer />
       <ScrambleIn />
       <CustomCursor />
+      {/* Film grain: static, decorative, never intercepts the pointer. */}
+      <div aria-hidden className="grain pointer-events-none fixed inset-0 z-[80]" />
     </>
   );
 }

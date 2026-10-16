@@ -7,10 +7,11 @@ import { CHART_BREAKPOINT, CHART_INNER, chartPoint, type ChartRect } from "@/lib
 /*
  * The hero's particle field.
  *
- * Every particle carries two homes: a scattered one and a place on the chart
- * (the line, the area under it, or a milestone). Scroll progress through the
- * pinned hero blends between them, each particle on its own slightly offset
- * schedule, so the cloud visibly sorts itself into the chart.
+ * Every particle carries three homes: a scattered one, a point on the letters
+ * of the name, and a place on the chart (the line, the area under it, or a
+ * milestone). On arrival the particles write the name exactly over the real
+ * heading, which then fades in as they let go; scroll progress through the
+ * pinned hero then sorts the cloud into the chart.
  *
  * All motion is computed in the vertex shader from a handful of uniforms, so a
  * frame costs one draw call no matter how many particles there are. Raw WebGL
@@ -21,6 +22,7 @@ const VERTEX = /* glsl */ `
 attribute vec3 aScatter;  // x, y in 0..1, depth 0..1
 attribute vec3 aTarget;   // x, y in 0..1, kind: 0 area · 1 line · 2 milestone
 attribute float aSeed;
+attribute vec2 aName;     // a point on the glyphs of the hero name, 0..1
 
 uniform vec2 uRes;
 uniform vec2 uMouse;
@@ -30,6 +32,7 @@ uniform float uIntro;
 uniform float uDpr;
 uniform float uMotion;
 uniform float uScale;
+uniform float uName;      // 0..1 how firmly the particles hold the name
 
 varying float vAlpha;
 varying float vSettled;
@@ -45,6 +48,11 @@ void main() {
   vec2 target = aTarget.xy + vec2(0.0, sin(t * 1.3 + aSeed * 40.0) * 0.0025);
   vec2 pos = mix(scatter, target, p);
 
+  float nameLocal = clamp(uName * 1.3 - aSeed * 0.3, 0.0, 1.0);
+  float nm = nameLocal * nameLocal * (3.0 - 2.0 * nameLocal);
+  pos = mix(pos, aName + vec2(sin(t * 2.0 + aSeed * 30.0) * 0.0006, 0.0), nm);
+  float held = max(p, nm);
+
   float intro = clamp(uIntro * 1.4 - aSeed * 0.4, 0.0, 1.0);
   intro = 1.0 - pow(1.0 - intro, 3.0);
   pos = mix(vec2(0.5, 0.55), pos, intro);
@@ -54,20 +62,20 @@ void main() {
   float dist = length(d) + 0.0001;
   float radius = 150.0 * uDpr;
   float push = max(0.0, radius - dist) / radius;
-  px += (d / dist) * push * push * 70.0 * uDpr * (1.0 - 0.75 * p) * uMotion;
+  px += (d / dist) * push * push * 70.0 * uDpr * (1.0 - 0.75 * held) * uMotion;
 
   vec2 clip = (px / uRes) * 2.0 - 1.0;
   gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
 
   float kind = aTarget.z;
   float settledSize = kind > 1.5 ? 4.0 : (kind > 0.5 ? 2.4 : 1.8);
-  gl_PointSize = mix(1.4 + aScatter.z * 2.4, settledSize, p) * uDpr * uScale;
+  gl_PointSize = mix(mix(1.4 + aScatter.z * 2.4, settledSize, p), 3.2, nm) * uDpr * uScale;
 
   // Milestones stay soft: the crisp marker is a DOM ring (ChartLabels); stacked
   // additive particles would otherwise burn out to a white blob.
   float settledAlpha = kind > 1.5 ? 0.45 : (kind > 0.5 ? 0.85 : 0.3);
-  vAlpha = mix(0.22 + aScatter.z * 0.5, settledAlpha, p) * intro;
-  vSettled = p;
+  vAlpha = mix(mix(0.22 + aScatter.z * 0.5, settledAlpha, p), 0.95, nm) * intro;
+  vSettled = held;
 }
 `;
 
@@ -158,25 +166,44 @@ export function ParticleField() {
     const readout = stage?.querySelector<HTMLElement>("[data-sorted-value]") ?? null;
     if (!section || !stage) return;
 
+    // The real heading stays hidden until the particles have written it
+    // (globals.css). Any path that cannot draw it must reveal it at once.
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      stage.setAttribute("data-name", "revealed");
+    };
+
     const gl = canvas.getContext("webgl", {
       alpha: true,
       antialias: false,
       premultipliedAlpha: true,
       powerPreference: "high-performance",
     });
-    if (!gl) return; // No WebGL: the labels and copy still tell the story.
+    if (!gl) {
+      reveal(); // No WebGL: the labels and copy still tell the story.
+      return;
+    }
 
     const vs = compile(gl, gl.VERTEX_SHADER, VERTEX);
     const fs = compile(gl, gl.FRAGMENT_SHADER, FRAGMENT);
     const program = gl.createProgram();
-    if (!vs || !fs || !program) return;
+    if (!vs || !fs || !program) {
+      reveal();
+      return;
+    }
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      reveal();
+      return;
+    }
     gl.useProgram(program);
 
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) reveal();
     const desktopQuery = matchMedia(CHART_BREAKPOINT);
     const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
     const count = Math.round((desktopQuery.matches ? 2600 : 1400) * (lowPower ? 0.5 : 1));
@@ -237,7 +264,59 @@ export function ParticleField() {
     bind("aSeed", seeds, 1);
     const targetBuffer = bind("aTarget", buildTargets(count, initialRect, kinds, picks), 3);
 
+    const nameBuffer = bind("aName", new Float32Array(count * 2), 2);
+
+    /**
+     * Points on the glyphs of the hero heading, in canvas-normalised space:
+     * every character is drawn where it really sits, in the same font, then
+     * the drawing is sampled. Returns false when there is nothing to draw on.
+     */
+    const sampleName = () => {
+      const heading = stage.querySelector("h1");
+      const chars = heading ? Array.from(heading.querySelectorAll<HTMLElement>(".hero-char")) : [];
+      const c = canvas.getBoundingClientRect();
+      if (!heading || !chars.length || c.width < 1 || c.height < 1) return false;
+      const off = document.createElement("canvas");
+      off.width = Math.ceil(c.width);
+      off.height = Math.ceil(c.height);
+      const ctx = off.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return false;
+      const style = getComputedStyle(heading);
+      const size = parseFloat(style.fontSize);
+      ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = "#fff";
+      const metrics = ctx.measureText("Hg");
+      const ascent = metrics.fontBoundingBoxAscent || size * 0.8;
+      const descent = metrics.fontBoundingBoxDescent || size * 0.2;
+      for (const char of chars) {
+        const r = char.getBoundingClientRect();
+        const baseline = r.top - c.top + (r.height - (ascent + descent)) / 2 + ascent;
+        ctx.fillText(char.textContent ?? "", r.left - c.left, baseline);
+      }
+      const { data, width, height } = ctx.getImageData(0, 0, off.width, off.height);
+      const step = 3;
+      const points: number[] = [];
+      for (let y = 0; y < height; y += step) {
+        for (let x = 0; x < width; x += step) {
+          if (data[(y * width + x) * 4 + 3] > 140) points.push(x / width, y / height);
+        }
+      }
+      const total = points.length / 2;
+      if (total < 50) return false;
+      const out = new Float32Array(count * 2);
+      for (let i = 0; i < count; i++) {
+        const k = Math.floor(Math.random() * total);
+        out[i * 2] = points[k * 2] + ((Math.random() - 0.5) * step) / width;
+        out[i * 2 + 1] = points[k * 2 + 1] + ((Math.random() - 0.5) * step) / height;
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, nameBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, out, gl.STATIC_DRAW);
+      return true;
+    };
+
     const u = (name: string) => gl.getUniformLocation(program, name);
+    const uName = u("uName");
     const uScale = u("uScale");
     const uRes = u("uRes");
     const uMouse = u("uMouse");
@@ -346,9 +425,36 @@ export function ParticleField() {
     const themeObserver = new MutationObserver(readPalette);
     themeObserver.observe(html, { attributes: true, attributeFilter: ["data-theme", "data-accent"] });
 
+    // Name phase: write the name (form), keep it (hold), let go (leave).
+    const NAME_FORM = 1300;
+    const NAME_HOLD = 900;
+    const NAME_LEAVE = 1300;
+    let nameStart: number | null = null;
+
+    const nameAmount = (now: number) => {
+      if (nameStart === null) return 0;
+      // A visitor already scrolling should not wait for the show.
+      if (progressTarget > 0.04 && now - nameStart < NAME_FORM + NAME_HOLD) nameStart = now - NAME_FORM - NAME_HOLD;
+      const e = now - nameStart;
+      if (e >= NAME_FORM + NAME_HOLD * 0.35) reveal();
+      if (e < NAME_FORM) return 1 - Math.pow(1 - e / NAME_FORM, 3);
+      if (e < NAME_FORM + NAME_HOLD) return 1;
+      if (e < NAME_FORM + NAME_HOLD + NAME_LEAVE) {
+        const u = (e - NAME_FORM - NAME_HOLD) / NAME_LEAVE;
+        return 1 - u * u * (3 - 2 * u);
+      }
+      nameStart = null;
+      return 0;
+    };
+
     const render = (now: number) => {
-      if (introStart === null && html.hasAttribute("data-ready")) introStart = now;
+      if (introStart === null && html.hasAttribute("data-ready")) {
+        introStart = now;
+        if (!reduceMotion && sampleName()) nameStart = now;
+        else reveal();
+      }
       const intro = reduceMotion ? 1 : introStart === null ? 0 : Math.min(1, (now - introStart) / 1800);
+      gl.uniform1f(uName, nameAmount(now));
 
       progress += (progressTarget - progress) * (reduceMotion ? 1 : 0.085);
       if (Math.abs(progress - lastP) > 0.0005) {

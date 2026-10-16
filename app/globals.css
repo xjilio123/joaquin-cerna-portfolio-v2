@@ -141,6 +141,11 @@
  *   mode   → the new page is clipped open as a circle (see switchMode)
  *   accent → a short crossfade
  */
+/* If a snapshot ever fails to capture, the page colour shows, never white. */
+::view-transition {
+  background-color: var(--bg);
+}
+
 html[data-vt="mode"]::view-transition-old(root),
 html[data-vt="mode"]::view-transition-new(root) {
   animation: none;
@@ -216,6 +221,28 @@ html[data-ready] .hero-char {
   to { transform: translateY(0); }
 }
 
+/* The particle field writes the hero name first (ParticleField). Until it
+   marks the stage as revealed the real heading stays invisible in place, then
+   fades in letter by letter under the particles. Without JavaScript the
+   attribute never exists; if anything stalls, the name appears after 4.5 s. */
+html[data-hero-intro] [data-hero-stage]:not([data-name="revealed"]) .hero-char {
+  opacity: 0;
+  transform: none;
+  animation: name-failsafe 600ms ease-out 4.5s forwards;
+}
+
+html[data-hero-intro] [data-hero-stage][data-name="revealed"] .hero-char {
+  opacity: 1;
+  transform: none;
+  animation: none;
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 22ms);
+}
+
+@keyframes name-failsafe {
+  to { opacity: 1; }
+}
+
 .reveal {
   --reveal-delay: 0ms;
 }
@@ -284,6 +311,33 @@ html[data-observing] [data-shown].loop {
 
 @keyframes marquee {
   to { transform: translateX(-50%); }
+}
+
+/* Section titles: outlined, then filled from left to right as they scroll
+   into view (MotionLayer drives --fill). Solid whenever motion is off. */
+@property --fill {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+html[data-motion] [data-fill] {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--fg);
+  background-image: linear-gradient(90deg, var(--fg) var(--fill), transparent var(--fill));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Film grain over the whole page: one static, composited layer. */
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.4 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  opacity: 0.07;
+}
+
+html[data-theme="light"] .grain {
+  opacity: 0.05;
 }
 
 /* ── Preloader ─────────────────────────────────────────────────────────── */

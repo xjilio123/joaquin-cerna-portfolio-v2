@@ -10,6 +10,7 @@ export function CopyEmailButton({ lang }: { lang: Lang }) {
   return (
     <button
       type="button"
+      data-cursor={tr("cursor.copy", lang)}
       onClick={() => {
         navigator.clipboard
           ?.writeText(profile.email)

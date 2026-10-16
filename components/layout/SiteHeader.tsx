@@ -11,7 +11,7 @@ import { openCommandPalette } from "@/lib/command";
 import { SECTIONS, tr } from "@/lib/i18n";
 
 const pill =
-  "rounded-full border border-line bg-surface/80 backdrop-blur-md transition-[height,background-color,box-shadow] duration-500 ease-out-expo";
+  "rounded-full border border-line bg-linear-to-b from-surface/90 to-surface/70 shadow-[inset_0_1px_0_0_rgb(255_255_255/0.08),0_10px_30px_-14px_rgb(0_0_0/0.45)] backdrop-blur-md backdrop-saturate-150 transition-[height,background-color,box-shadow] duration-500 ease-out-expo";
 
 const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 const noop = () => () => {};

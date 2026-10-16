@@ -50,29 +50,52 @@ export function applyMode(mode: Mode) {
   persistPreference(MODE_STORAGE_KEY, mode);
 }
 
+/** When the page last (re)mounted — the first load or a language switch. */
+let mountedAt = 0;
+let current: ViewTransition | null = null;
+
+export const markPageMounted = () => {
+  mountedAt = performance.now();
+};
+
 const canTransition = () =>
   typeof document.startViewTransition === "function" &&
-  !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  !matchMedia("(prefers-reduced-motion: reduce)").matches &&
+  // Right after a language switch the new page is still settling (fonts,
+  // canvas, layout): animate nothing rather than snapshot a half-built page.
+  performance.now() - mountedAt > 900;
 
 /**
  * Runs `update` inside a view transition tagged with `kind` (html[data-vt]),
  * which selects its animation in globals.css. Returns null when the browser
  * cannot, or the visitor prefers no motion: the update then applies at once.
+ *
+ * Hardened against overlap: a transition still running is finished first,
+ * and any transition that outlives its animation is skipped after 1.5 s, so
+ * the page can never stay frozen on a half-captured snapshot.
  */
 function withTransition(kind: "mode" | "accent", update: () => void) {
+  const root = document.documentElement;
+  current?.skipTransition();
   if (!canTransition()) {
+    root.removeAttribute("data-vt");
     update();
     return null;
   }
-  const root = document.documentElement;
   // Set inside the update, with the theme itself: one style pass instead of two.
   const transition = document.startViewTransition(() => {
     root.setAttribute("data-vt", kind);
     update();
   });
-  transition.finished.finally(() => {
-    if (root.getAttribute("data-vt") === kind) root.removeAttribute("data-vt");
-  });
+  current = transition;
+  const watchdog = setTimeout(() => transition.skipTransition(), 1500);
+  transition.finished
+    .catch(() => {})
+    .finally(() => {
+      clearTimeout(watchdog);
+      if (current === transition) current = null;
+      if (root.getAttribute("data-vt") === kind) root.removeAttribute("data-vt");
+    });
   return transition;
 }
 

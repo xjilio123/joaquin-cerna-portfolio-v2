@@ -79,6 +79,7 @@ export function Contact({ lang, index }: { lang: Lang; index: number }) {
               href={profile.linkedin}
               target="_blank"
               rel="noreferrer"
+              data-cursor={tr("cursor.open", lang)}
               className="rounded-full border border-line px-4 py-2 text-sm text-fg transition-colors hover:border-fg"
             >
               {tr("contact.openLinkedin", lang)} ↗

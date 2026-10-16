@@ -77,6 +77,7 @@ export function Hero({ lang }: { lang: Lang }) {
                 <a
                   href={profile.cvPath}
                   download={profile.cvFileName}
+                  data-cursor={tr("cursor.download", lang)}
                   className="inline-flex h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-accent-fg sm:h-12 sm:px-6"
                 >
                   {tr("hero.downloadCv", lang)}

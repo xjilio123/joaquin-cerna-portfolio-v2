@@ -73,6 +73,22 @@ export function MotionLayer() {
           );
         });
 
+        // 2b ── Section titles fill in, accent lines draw across section edges
+        gsap.utils.toArray<HTMLElement>("[data-fill]").forEach((title) => {
+          gsap.fromTo(
+            title,
+            { "--fill": "0%" },
+            { "--fill": "100%", ease: "none", scrollTrigger: { trigger: title, start: "top 88%", end: "top 38%", scrub: 0.3 } },
+          );
+        });
+        gsap.utils.toArray<HTMLElement>("[data-wipe]").forEach((line) => {
+          gsap.fromTo(
+            line,
+            { scaleX: 0 },
+            { scaleX: 1, ease: "none", scrollTrigger: { trigger: line, start: "top 96%", end: "top 45%", scrub: 0.4 } },
+          );
+        });
+
         // 3 ── Horizontal experience, desktop only
         const media = gsap.matchMedia();
         media.add("(min-width: 1024px)", () => {
