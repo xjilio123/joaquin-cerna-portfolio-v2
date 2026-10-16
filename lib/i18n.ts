@@ -24,6 +24,7 @@ export const ui = {
   "nav.skills": { es: "Habilidades", en: "Skills" },
   "nav.experience": { es: "Experiencia", en: "Experience" },
   "nav.certifications": { es: "Certificaciones", en: "Certifications" },
+  "nav.sql": { es: "Consola", en: "Console" },
   "nav.projects": { es: "Proyectos", en: "Projects" },
   "nav.cv": { es: "CV", en: "CV" },
   "nav.contact": { es: "Contacto", en: "Contact" },
@@ -93,6 +94,11 @@ export const ui = {
   },
   "experience.current": { es: "Actual", en: "Current" },
 
+  "sql.title": { es: "Consulta mi perfil", en: "Query my profile" },
+  "sql.intro": {
+    es: "Mi experiencia, certificados y habilidades cargados en una base de datos de solo lectura. Escribe SQL o usa una consulta sugerida.",
+    en: "My experience, certificates and skills loaded into a read-only database. Write SQL or pick a suggested query.",
+  },
   "certifications.title": { es: "Formación verificable", en: "Verifiable training" },
   "certifications.intro": {
     es: "Cada tarjeta abre el certificado original. Filtra por institución o por tema.",
@@ -187,6 +193,7 @@ export const SECTIONS = [
   { id: "skills", label: "nav.skills" },
   { id: "experience", label: "nav.experience" },
   { id: "certifications", label: "nav.certifications" },
+  { id: "sql", label: "nav.sql" },
   { id: "projects", label: "nav.projects" },
   { id: "cv", label: "nav.cv" },
   { id: "contact", label: "nav.contact" },

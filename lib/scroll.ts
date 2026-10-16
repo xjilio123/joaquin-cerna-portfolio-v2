@@ -27,3 +27,27 @@ export function flagLanguageSwitch() {
     sessionStorage.setItem(SCRAMBLE_FLAG, "1");
   } catch {}
 }
+
+/** The section the visitor is reading: the last one whose top has passed 30 % of the screen. */
+function currentSectionId() {
+  let current = "top";
+  for (const section of document.querySelectorAll<HTMLElement>("main section[id]")) {
+    if (section.getBoundingClientRect().top <= window.innerHeight * 0.3) current = section.id;
+  }
+  return current;
+}
+
+/**
+ * Switches language with a full page load, deliberately. A client-side
+ * navigation between /es and /en keeps the previous page alive but hidden
+ * (React Activity): two copies of every section, a hidden WebGL canvas with a
+ * lost context, duplicate ids — and view transitions that capture that
+ * document can fail. A fresh load keeps exactly one page. The visitor lands
+ * back on the section they were reading, and the text scrambles in.
+ */
+export function switchLanguage(target: "es" | "en") {
+  const path = window.location.pathname.replace(/^\/(es|en)(?=\/|$)/, `/${target}`) || `/${target}`;
+  const section = currentSectionId();
+  flagLanguageSwitch();
+  window.location.assign(path + (section === "top" ? "" : `#${section}`));
+}

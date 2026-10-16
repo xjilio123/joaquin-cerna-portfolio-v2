@@ -199,6 +199,28 @@ export function MotionLayer() {
       document.fonts?.ready.then(refresh);
       window.addEventListener("load", refresh);
       cleanups.push(() => window.removeEventListener("load", refresh));
+
+      // Arriving on /en#certifications (a language switch, a shared link): the
+      // browser jumps to the anchor before the pins add their scroll length, so
+      // the section drifts further down. Land again after every refresh until
+      // the visitor scrolls on their own.
+      const anchor = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+      if (anchor) {
+        // Measured a frame after the refresh, once ScrollTrigger has put the scroll position back.
+        const land = () =>
+          requestAnimationFrame(() => window.scrollTo({ top: anchor.getBoundingClientRect().top + window.scrollY - 16, behavior: "instant" }));
+        const release = () => {
+          ScrollTrigger.removeEventListener("refresh", land);
+          for (const type of ["wheel", "touchstart", "keydown", "pointerdown"]) window.removeEventListener(type, release);
+        };
+        ScrollTrigger.addEventListener("refresh", land);
+        for (const type of ["wheel", "touchstart", "keydown", "pointerdown"]) window.addEventListener(type, release, { passive: true });
+        const timer = setTimeout(release, 4000);
+        cleanups.push(() => {
+          clearTimeout(timer);
+          release();
+        });
+      }
       refresh();
     })();
 

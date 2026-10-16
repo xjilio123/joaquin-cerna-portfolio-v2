@@ -12,6 +12,7 @@ import { Experience } from "@/components/sections/Experience";
 import { Hero } from "@/components/sections/Hero";
 import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
+import { SqlSection } from "@/components/sections/SqlSection";
 import { CustomCursor } from "@/components/motion/CustomCursor";
 import { MotionLayer } from "@/components/motion/MotionLayer";
 import { ScrambleIn } from "@/components/motion/ScrambleIn";
@@ -71,9 +72,10 @@ export default async function HomePage() {
         <Skills lang={locale} index={2} />
         <Experience lang={locale} index={3} />
         <Certifications lang={locale} index={4} />
-        <Projects lang={locale} index={5} />
-        <CvSection lang={locale} index={6} />
-        <Contact lang={locale} index={7} />
+        <SqlSection lang={locale} index={5} />
+        <Projects lang={locale} index={6} />
+        <CvSection lang={locale} index={7} />
+        <Contact lang={locale} index={8} />
       </main>
       <SiteFooter lang={locale} />
       <CommandPalette lang={locale} />

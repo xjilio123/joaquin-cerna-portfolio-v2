@@ -1,20 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import type { MouseEvent } from "react";
 import type { Lang } from "@/content/types";
 import { LOCALES, tr } from "@/lib/i18n";
-import { flagLanguageSwitch } from "@/lib/scroll";
+import { switchLanguage } from "@/lib/scroll";
 
 /**
  * ES / EN switch. Each language has its own URL (/es, /en) so search engines
- * index both. Switching keeps the visitor on the same section by carrying the
- * current hash and leaving the scroll position alone.
+ * index both. Switching reloads the page on purpose (see switchLanguage) and
+ * lands the visitor back on the section they were reading.
  */
 export function LangToggle({ lang }: { lang: Lang }) {
   const pathname = usePathname();
-  const router = useRouter();
 
   const hrefFor = (target: Lang) => pathname.replace(/^\/(es|en)(?=\/|$)/, `/${target}`) || `/${target}`;
 
@@ -22,8 +21,7 @@ export function LangToggle({ lang }: { lang: Lang }) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
     event.preventDefault();
     if (target === lang) return;
-    flagLanguageSwitch();
-    router.push(hrefFor(target) + window.location.hash, { scroll: false });
+    switchLanguage(target);
   }
 
   return (
@@ -34,6 +32,7 @@ export function LangToggle({ lang }: { lang: Lang }) {
           <Link
             key={code}
             href={hrefFor(code)}
+            prefetch={false}
             hrefLang={code}
             lang={code}
             aria-current={active ? "true" : undefined}

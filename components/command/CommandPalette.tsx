@@ -1,13 +1,12 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import type { Lang } from "@/content/types";
 import { profile } from "@/content";
 import { currentMode, switchAccent, switchMode, useMode } from "@/components/theme/use-theme-state";
 import { COMMAND_EVENT } from "@/lib/command";
 import { SECTIONS, tr } from "@/lib/i18n";
-import { flagLanguageSwitch, scrollToId } from "@/lib/scroll";
+import { scrollToId, switchLanguage } from "@/lib/scroll";
 import { ACCENTS } from "@/lib/preferences";
 
 type Group = "navigate" | "preferences" | "actions";
@@ -45,8 +44,6 @@ export function CommandPalette({ lang }: { lang: Lang }) {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const [status, setStatus] = useState<string | null>(null);
-  const router = useRouter();
-  const pathname = usePathname();
   const listId = useId();
   const mode = useMode();
 
@@ -85,11 +82,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
         group: "preferences",
         label: tr("cmd.toLanguage", lang),
         keywords: "idioma language english espanol ingles",
-        run: () => {
-          const target = pathname.replace(/^\/(es|en)(?=\/|$)/, `/${other}`) || `/${other}`;
-          flagLanguageSwitch();
-          router.push(target + window.location.hash, { scroll: false });
-        },
+        run: () => switchLanguage(other),
       },
       {
         id: "cv",
@@ -120,7 +113,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
         },
       },
     ];
-  }, [lang, mode, pathname, router]);
+  }, [lang, mode]);
 
   const results = useMemo(() => {
     const tokens = normalize(query).split(/\s+/).filter(Boolean);

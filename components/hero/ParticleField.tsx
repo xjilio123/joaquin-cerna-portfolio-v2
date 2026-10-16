@@ -181,7 +181,7 @@ export function ParticleField() {
       premultipliedAlpha: true,
       powerPreference: "high-performance",
     });
-    if (!gl) {
+    if (!gl || gl.isContextLost()) {
       reveal(); // No WebGL: the labels and copy still tell the story.
       return;
     }
@@ -523,7 +523,8 @@ export function ParticleField() {
       window.removeEventListener("pointermove", onPointerMove);
       document.documentElement.removeEventListener("pointerleave", onPointerLeave);
       document.removeEventListener("visibilitychange", onVisibility);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      // The context is not force-lost here: if React shows this canvas again
+      // (hidden-then-visible Activity), the same context must still work.
     };
   }, []);
 
