@@ -16,14 +16,47 @@ import { CustomCursor } from "@/components/motion/CustomCursor";
 import { MotionLayer } from "@/components/motion/MotionLayer";
 import { ScrambleIn } from "@/components/motion/ScrambleIn";
 import { RevealObserver } from "@/components/ui/RevealObserver";
-import { isLocale, tr } from "@/lib/i18n";
+import { certifications, education, experience, profile, skills } from "@/content";
+import { isLocale, t, tr } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 export default async function HomePage() {
   const locale = await lang();
   if (!isLocale(locale)) notFound();
 
+  /** Structured data: the same facts the page states, in a form search engines read. */
+  const current = experience.find((entry) => /Actualidad|Present/.test(entry.period.es));
+  const person = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: profile.name,
+    alternateName: profile.shortName,
+    jobTitle: current ? t(current.role, locale) : t(profile.title, locale),
+    worksFor: current ? { "@type": "Organization", name: current.company } : undefined,
+    description: t(profile.metaDescription, locale),
+    url: `${SITE_URL}/${locale}`,
+    image: `${SITE_URL}/images/portrait-about.webp`,
+    email: `mailto:${profile.email}`,
+    address: { "@type": "PostalAddress", addressLocality: "Lima", addressCountry: "PE" },
+    alumniOf: education.map((entry) => ({ "@type": "EducationalOrganization", name: entry.institution })),
+    knowsAbout: skills.filter((group) => group.id !== "languages").flatMap((group) => group.items.map((item) => item.name)),
+    knowsLanguage: ["es", "en"],
+    hasCredential: certifications.map((certification) => ({
+      "@type": "EducationalOccupationalCredential",
+      name: t(certification.title, locale),
+      credentialCategory: "certificate",
+      dateCreated: certification.date,
+    })),
+    sameAs: [profile.linkedin],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // Escaped so a "<" in any content field cannot close the script element.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(person).replace(/</g, "\\u003c") }}
+      />
       <Preloader lang={locale} />
       <a
         href="#main"

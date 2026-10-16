@@ -11,7 +11,7 @@ import { openCommandPalette } from "@/lib/command";
 import { SECTIONS, tr } from "@/lib/i18n";
 
 const pill =
-  "rounded-full border border-line bg-surface/70 backdrop-blur-xl transition-[height,background-color,box-shadow] duration-500 ease-out-expo";
+  "rounded-full border border-line bg-surface/80 backdrop-blur-md transition-[height,background-color,box-shadow] duration-500 ease-out-expo";
 
 const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 const noop = () => () => {};
@@ -106,7 +106,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
       >
         <Link
           href={`/${lang}`}
-          aria-label={tr("nav.home", lang)}
+          aria-label={`JCR — ${tr("nav.home", lang)}`}
           className={`${pill} ${height} ${raised} grid place-items-center px-5 font-mono text-sm font-semibold tracking-wider text-fg hover:text-accent`}
         >
           JCR
@@ -144,11 +144,11 @@ export function SiteHeader({ lang }: { lang: Lang }) {
           <button
             type="button"
             onClick={openCommandPalette}
-            aria-label={tr("cmd.open", lang)}
             aria-keyshortcuts={mac ? "Meta+K" : "Control+K"}
             className={`${pill} ${height} ${raised} hidden items-center gap-2 pl-4 pr-2 text-sm text-muted hover:text-fg xl:flex`}
           >
             {tr("nav.search", lang)}
+            <span className="sr-only">({tr("cmd.title", lang)})</span>
             <kbd className="rounded-full border border-line bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-fg">
               {mac ? "⌘K" : "Ctrl K"}
             </kbd>

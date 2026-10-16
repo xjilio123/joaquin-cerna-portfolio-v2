@@ -7,11 +7,9 @@
  *   data-theme  = dark | light                       (absent → follows the OS)
  *   data-accent = cobalt | violet | crimson | emerald | graphite
  *
- * The live tokens are registered with @property so the browser interpolates
- * them: an accent change melts across the whole page in 500 ms instead of
- * hard-cutting. A mode change runs inside a view transition instead (see
- * components/theme/ModeToggle.tsx), so token transitions are suspended while
- * it captures its snapshots.
+ * Theme changes are animated with view transitions (see the end of this file
+ * and components/theme/use-theme-state.ts), never by transitioning tokens:
+ * a token transition would restyle every element on every frame.
  */
 
 @property --bg { syntax: "<color>"; inherits: true; initial-value: #0b0c0f; }
@@ -41,17 +39,6 @@
 
   --accent: var(--a-cobalt);
   color-scheme: dark;
-
-  --token-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  transition:
-    --bg 500ms var(--token-ease),
-    --surface 500ms var(--token-ease),
-    --surface-2 500ms var(--token-ease),
-    --line 500ms var(--token-ease),
-    --fg 500ms var(--token-ease),
-    --muted 500ms var(--token-ease),
-    --accent 500ms var(--token-ease),
-    --accent-fg 500ms var(--token-ease);
 }
 
 /* ── Light ──────────────────────────────────────────────────────────────── */
@@ -64,10 +51,10 @@
   --muted: #4a4f59;
   --accent-fg: #f7f6f2;
 
-  --a-cobalt: #2f5be0;
+  --a-cobalt: #2a52ca;
   --a-violet: #6d3fe0;
-  --a-crimson: #c42a31;
-  --a-emerald: #0b7a65;
+  --a-crimson: #b0262c;
+  --a-emerald: #096957;
   --a-graphite: #1c1d21;
   color-scheme: light;
 }
@@ -83,10 +70,10 @@
     --muted: #4a4f59;
     --accent-fg: #f7f6f2;
 
-    --a-cobalt: #2f5be0;
+    --a-cobalt: #2a52ca;
     --a-violet: #6d3fe0;
-    --a-crimson: #c42a31;
-    --a-emerald: #0b7a65;
+    --a-crimson: #b0262c;
+    --a-emerald: #096957;
     --a-graphite: #1c1d21;
     color-scheme: light;
   }
@@ -99,8 +86,6 @@
 :root[data-accent="emerald"] { --accent: var(--a-emerald); }
 :root[data-accent="graphite"] { --accent: var(--a-graphite); }
 
-/* A mode switch is animated by the view transition, not by the tokens. */
-:root[data-switching] { transition: none; }
 
 @theme inline {
   --color-bg: var(--bg);
@@ -150,11 +135,30 @@
   }
 }
 
-/* ── View transition for the mode switch ───────────────────────────────── */
-::view-transition-old(root),
-::view-transition-new(root) {
+/* ── View transitions for theme changes ────────────────────────────────────
+ * Tokens switch in a single step (one style pass); the browser animates
+ * snapshots on the compositor instead of restyling the page every frame.
+ *   mode   → the new page is clipped open as a circle (see switchMode)
+ *   accent → a short crossfade
+ */
+html[data-vt="mode"]::view-transition-old(root),
+html[data-vt="mode"]::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+
+/* While a theme change is animating, element-level colour transitions would
+   restyle on every frame for nothing: the snapshots already animate it. */
+html[data-vt] *,
+html[data-vt] *::before,
+html[data-vt] *::after {
+  transition: none !important;
+}
+
+html[data-vt="accent"]::view-transition-old(root),
+html[data-vt="accent"]::view-transition-new(root) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ── Smooth scroll (Lenis) ─────────────────────────────────────────────── */
@@ -283,6 +287,26 @@ html[data-observing] [data-shown].loop {
 }
 
 /* ── Preloader ─────────────────────────────────────────────────────────── */
+@property --count {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@counter-style pad3 {
+  system: extends decimal;
+  pad: 3 "0";
+}
+
+/* The counter is reset on the element itself: --count does not inherit. */
+.preloader-count {
+  counter-reset: count var(--count);
+}
+
+.preloader-count::before {
+  content: counter(count, pad3);
+}
+
 .preloader {
   display: none;
 }
@@ -352,8 +376,6 @@ dialog[open] .menu-link {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root { transition: none; }
-
   .hero-char,
   .reveal,
   .menu-link,

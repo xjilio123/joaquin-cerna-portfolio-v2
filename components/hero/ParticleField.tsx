@@ -296,6 +296,19 @@ export function ParticleField() {
     const fallbackAccent: [number, number, number] = [0.42, 0.58, 1];
     const fallbackMuted: [number, number, number] = [0.64, 0.66, 0.71];
 
+    // Colours are read once per theme change, never per frame: a computed-style
+    // read inside the loop would force a style pass on every frame.
+    const palette = { accent: fallbackAccent, muted: fallbackMuted, light: false };
+    const readPalette = () => {
+      const styles = getComputedStyle(html);
+      palette.accent = readColor(styles.getPropertyValue("--accent"), fallbackAccent);
+      palette.muted = readColor(styles.getPropertyValue("--muted"), fallbackMuted);
+      palette.light = html.getAttribute("data-theme") === "light";
+    };
+    readPalette();
+    const themeObserver = new MutationObserver(readPalette);
+    themeObserver.observe(html, { attributes: true, attributeFilter: ["data-theme", "data-accent"] });
+
     const render = (now: number) => {
       if (introStart === null && html.hasAttribute("data-ready")) introStart = now;
       const intro = reduceMotion ? 1 : introStart === null ? 0 : Math.min(1, (now - introStart) / 1800);
@@ -314,11 +327,7 @@ export function ParticleField() {
       mouse.x += (mouse.tx - mouse.x) * 0.15;
       mouse.y += (mouse.ty - mouse.y) * 0.15;
 
-      // Reading the live tokens means the field follows the 500 ms accent melt for free.
-      const styles = getComputedStyle(html);
-      const accent = readColor(styles.getPropertyValue("--accent"), fallbackAccent);
-      const muted = readColor(styles.getPropertyValue("--muted"), fallbackMuted);
-      const light = html.getAttribute("data-theme") === "light";
+      const { accent, muted, light } = palette;
 
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.uniform1f(uProgress, progress);
@@ -361,6 +370,7 @@ export function ParticleField() {
 
     return () => {
       stopLoop();
+      themeObserver.disconnect();
       intersection.disconnect();
       resizeObserver.disconnect();
       desktopQuery.removeEventListener("change", onBreakpoint);

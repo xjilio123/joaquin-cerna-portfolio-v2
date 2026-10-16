@@ -5,7 +5,7 @@ import type { Lang } from "@/content/types";
 import { tr } from "@/lib/i18n";
 import { INTRO_STORAGE_KEY } from "@/lib/preferences";
 
-const DURATION = 1400;
+const DURATION = 1100;
 
 /**
  * First-visit curtain: a counter runs 000 → 100 while the fonts load, then the
@@ -45,7 +45,9 @@ export function Preloader({ lang }: { lang: Lang }) {
       // Hold at 90 % until the type is ready, so the hero never swaps fonts on reveal.
       if (!fontsReady) progress = Math.min(progress, 0.9);
       const eased = 1 - Math.pow(1 - progress, 3);
-      if (countRef.current) countRef.current.textContent = String(Math.round(eased * 100)).padStart(3, "0");
+      // A CSS counter, not textContent: the document text never changes, so the
+      // browser does not report a new largest paint on every frame.
+      countRef.current?.style.setProperty("--count", String(Math.round(eased * 100)));
       if (barRef.current) barRef.current.style.transform = `scaleX(${eased})`;
       if (progress < 1) frame = requestAnimationFrame(tick);
       else finish();
@@ -74,7 +76,7 @@ export function Preloader({ lang }: { lang: Lang }) {
           {tr("intro.data", lang)} → <span className="text-fg">{tr("intro.decisions", lang)}</span>
         </p>
         <p className="font-display text-[clamp(5rem,18vw,15rem)] font-bold leading-[0.8] tracking-[-0.05em] text-fg tabular-nums">
-          <span ref={countRef}>000</span>
+          <span ref={countRef} className="preloader-count" />
           <span className="text-accent">%</span>
         </p>
       </div>

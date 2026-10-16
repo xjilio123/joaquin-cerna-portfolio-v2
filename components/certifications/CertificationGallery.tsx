@@ -155,7 +155,6 @@ export function CertificationGallery({ lang }: { lang: Lang }) {
                   type="button"
                   data-tilt
                   onClick={() => show(certification)}
-                  aria-label={`${tr("certifications.open", lang)}: ${t(certification.title, lang)}`}
                   className="group flex size-full flex-col overflow-hidden rounded-3xl border border-line bg-surface text-left transition-[border-color,translate] duration-500 ease-out-expo hover:-translate-y-1 hover:border-accent/60"
                 >
                   <div className="relative aspect-[16/11] w-full overflow-hidden bg-[#f4f2ec]">
@@ -179,6 +178,7 @@ export function CertificationGallery({ lang }: { lang: Lang }) {
                     ) : null}
                   </div>
                   <div className="flex flex-1 flex-col gap-2 p-5">
+                    <span className="sr-only">{tr("certifications.open", lang)}:</span>
                     <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent">{issuers[certification.issuer].name}</p>
                     <h3 className="font-display text-lg font-semibold leading-snug tracking-tight text-fg">{t(certification.title, lang)}</h3>
                     <p className="mt-auto pt-2 text-sm text-muted">

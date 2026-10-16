@@ -50,36 +50,59 @@ export function applyMode(mode: Mode) {
   persistPreference(MODE_STORAGE_KEY, mode);
 }
 
+const canTransition = () =>
+  typeof document.startViewTransition === "function" &&
+  !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * Runs `update` inside a view transition tagged with `kind` (html[data-vt]),
+ * which selects its animation in globals.css. Returns null when the browser
+ * cannot, or the visitor prefers no motion: the update then applies at once.
+ */
+function withTransition(kind: "mode" | "accent", update: () => void) {
+  if (!canTransition()) {
+    update();
+    return null;
+  }
+  const root = document.documentElement;
+  // Set inside the update, with the theme itself: one style pass instead of two.
+  const transition = document.startViewTransition(() => {
+    root.setAttribute("data-vt", kind);
+    update();
+  });
+  transition.finished.finally(() => {
+    if (root.getAttribute("data-vt") === kind) root.removeAttribute("data-vt");
+  });
+  return transition;
+}
+
 /**
  * Switches mode with the new one revealed as a circle growing from `origin`
- * (the button that was pressed, or the centre of the screen). Without
- * view-transition support, or with reduced motion requested, it just switches.
+ * (the button that was pressed, or the centre of the screen). The circle
+ * starts fast and settles, so the click answers immediately.
  */
 export function switchMode(next: Mode, origin?: { x: number; y: number }) {
-  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (typeof document.startViewTransition !== "function" || reduceMotion) {
-    applyMode(next);
-    return;
-  }
+  const transition = withTransition("mode", () => applyMode(next));
+  if (!transition) return;
 
   const x = origin?.x ?? innerWidth / 2;
   const y = origin?.y ?? innerHeight / 2;
   const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
 
-  const root = document.documentElement;
-  root.setAttribute("data-switching", "");
-  const transition = document.startViewTransition(() => applyMode(next));
-
   transition.ready
     .then(() => {
-      root.animate(
+      document.documentElement.animate(
         { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-        { duration: 650, easing: "cubic-bezier(0.65, 0, 0.35, 1)", pseudoElement: "::view-transition-new(root)" },
+        { duration: 560, easing: "cubic-bezier(0.22, 1, 0.36, 1)", pseudoElement: "::view-transition-new(root)" },
       );
     })
     .catch(() => {});
+}
 
-  transition.finished.finally(() => root.removeAttribute("data-switching"));
+/** Changes the accent with a short crossfade of the whole page. */
+export function switchAccent(accent: Accent) {
+  if (document.documentElement.getAttribute("data-accent") === accent) return;
+  withTransition("accent", () => applyAccent(accent));
 }
 
 export const currentMode = (): Mode =>

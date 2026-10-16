@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Lang } from "@/content/types";
 import { tr } from "@/lib/i18n";
 import { ACCENTS } from "@/lib/preferences";
-import { applyAccent, useAccent } from "./use-theme-state";
+import { switchAccent, useAccent } from "./use-theme-state";
 
 /**
  * Accent colour picker: a dot showing the current accent that opens a row of
@@ -64,7 +64,7 @@ export function AccentPicker({ lang }: { lang: Lang }) {
               aria-label={tr(`theme.accent.${name}`, lang)}
               title={tr(`theme.accent.${name}`, lang)}
               tabIndex={open ? 0 : -1}
-              onClick={() => applyAccent(name)}
+              onClick={() => switchAccent(name)}
               className="grid size-9 place-items-center rounded-full transition-transform duration-300 ease-out-expo hover:scale-110"
             >
               <span

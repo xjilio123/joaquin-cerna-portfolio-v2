@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import type { Lang } from "@/content/types";
 import { profile } from "@/content";
-import { applyAccent, currentMode, switchMode, useMode } from "@/components/theme/use-theme-state";
+import { currentMode, switchAccent, switchMode, useMode } from "@/components/theme/use-theme-state";
 import { COMMAND_EVENT } from "@/lib/command";
 import { SECTIONS, tr } from "@/lib/i18n";
 import { flagLanguageSwitch, scrollToId } from "@/lib/scroll";
@@ -78,7 +78,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
         label: `${tr("cmd.accent", lang)}: ${tr(`theme.accent.${name}`, lang)}`,
         keywords: `color colour acento accent ${name}`,
         icon: <Swatch name={name} />,
-        run: () => applyAccent(name),
+        run: () => requestAnimationFrame(() => switchAccent(name)),
       })),
       {
         id: "language",
