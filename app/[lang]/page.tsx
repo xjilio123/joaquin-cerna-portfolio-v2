@@ -10,6 +10,7 @@ import { Contact } from "@/components/sections/Contact";
 import { CvSection } from "@/components/sections/CvSection";
 import { Experience } from "@/components/sections/Experience";
 import { Hero } from "@/components/sections/Hero";
+import { Process } from "@/components/sections/Process";
 import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
 import { SqlSection } from "@/components/sections/SqlSection";
@@ -70,12 +71,13 @@ export default async function HomePage() {
         <Hero lang={locale} />
         <About lang={locale} index={1} />
         <Skills lang={locale} index={2} />
-        <Experience lang={locale} index={3} />
-        <Certifications lang={locale} index={4} />
-        <SqlSection lang={locale} index={5} />
-        <Projects lang={locale} index={6} />
-        <CvSection lang={locale} index={7} />
-        <Contact lang={locale} index={8} />
+        <Process lang={locale} index={3} />
+        <Experience lang={locale} index={4} />
+        <Certifications lang={locale} index={5} />
+        <SqlSection lang={locale} index={6} />
+        <Projects lang={locale} index={7} />
+        <CvSection lang={locale} index={8} />
+        <Contact lang={locale} index={9} />
       </main>
       <SiteFooter lang={locale} />
       <CommandPalette lang={locale} />

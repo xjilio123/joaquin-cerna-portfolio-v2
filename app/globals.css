@@ -187,6 +187,8 @@ html.lenis {
 
 /* "fx" variant: only while the motion layer is running (never with reduced motion). */
 @custom-variant fx (html[data-motion] &);
+/* Laptop screens with little height (1366×768, 1280×720): pinned sections compact. */
+@custom-variant short (@media (max-height: 860px));
 
 /* ── Entrance choreography ─────────────────────────────────────────────────
  * Hidden only while the intro is pending, revealed once <html> gains

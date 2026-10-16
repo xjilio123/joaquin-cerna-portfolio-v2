@@ -99,7 +99,7 @@ export const skills: SkillGroup[] = [
       { name: "Español", level: { es: "Nativo", en: "Native" } },
       {
         name: "English",
-        level: { es: "Avanzado — MET, U. of Michigan", en: "Advanced — MET, U. of Michigan" },
+        level: { es: "Avanzado — ICPNA", en: "Advanced — ICPNA" },
       },
     ],
   },

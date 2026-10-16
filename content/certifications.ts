@@ -219,18 +219,6 @@ const entries: Certification[] = [
     pdf: "/certificates/OTROS_CERTIFICADOS.pdf",
   },
   {
-    id: "icpna-met",
-    issuer: "icpna",
-    title: { es: "MET — Inglés Avanzado", en: "MET — Advanced English" },
-    date: "2021-12-01",
-    dateLabel: { es: "2021", en: "2021" },
-    detail: {
-      es: "Michigan English Test · University of Michigan",
-      en: "Michigan English Test · University of Michigan",
-    },
-    topics: ["languages"],
-  },
-  {
     id: "cisco-cyber",
     issuer: "cisco",
     title: { es: "Introducción a la Seguridad Cibernética", en: "Introduction to Cybersecurity" },

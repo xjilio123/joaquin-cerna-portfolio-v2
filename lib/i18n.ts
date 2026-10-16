@@ -22,6 +22,7 @@ export const ui = {
   "nav.home": { es: "Inicio", en: "Home" },
   "nav.about": { es: "Perfil", en: "About" },
   "nav.skills": { es: "Habilidades", en: "Skills" },
+  "nav.process": { es: "Método", en: "Process" },
   "nav.experience": { es: "Experiencia", en: "Experience" },
   "nav.certifications": { es: "Certificaciones", en: "Certifications" },
   "nav.sql": { es: "Consola", en: "Console" },
@@ -94,6 +95,12 @@ export const ui = {
   },
   "experience.current": { es: "Actual", en: "Current" },
 
+  "process.title": { es: "De datos sucios a una decisión", en: "From messy data to a decision" },
+  "process.intro": {
+    es: "Así trabajo un caso de punta a punta. Los datos de esta sección son de ejemplo.",
+    en: "How I take a case from end to end. The data in this section is sample data.",
+  },
+  "process.sample": { es: "Datos de ejemplo", en: "Sample data" },
   "sql.title": { es: "Consulta mi perfil", en: "Query my profile" },
   "sql.intro": {
     es: "Mi experiencia, certificados y habilidades cargados en una base de datos de solo lectura. Escribe SQL o usa una consulta sugerida.",
@@ -191,6 +198,7 @@ export const tr = (key: UiKey, lang: Lang) => ui[key][lang];
 export const SECTIONS = [
   { id: "about", label: "nav.about" },
   { id: "skills", label: "nav.skills" },
+  { id: "process", label: "nav.process" },
   { id: "experience", label: "nav.experience" },
   { id: "certifications", label: "nav.certifications" },
   { id: "sql", label: "nav.sql" },

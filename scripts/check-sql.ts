@@ -29,7 +29,7 @@ expect("show tables", run("SHOW TABLES;", es, messages, "es"), (r) => rows(r).le
 expect("select * experiencia", run("select * from experiencia", es, messages, "es"), (r) => rows(r).length === 4);
 expect("current role", run("SELECT empresa, rol FROM experiencia WHERE actual = TRUE;", es, messages, "es"), (r) => rows(r).length === 1 && rows(r)[0][0] === "PREDIQT");
 expect("count by issuer", run("SELECT emisor, COUNT(*) AS total FROM certificaciones GROUP BY emisor ORDER BY total DESC LIMIT 3", es, messages, "es"), (r) => rows(r)[0]?.[0] === "Netzun" && rows(r)[0]?.[1] === 5);
-expect("count all", run("SELECT COUNT(*) FROM certificaciones", es, messages, "es"), (r) => rows(r)[0]?.[0] === 13);
+expect("count all", run("SELECT COUNT(*) FROM certificaciones", es, messages, "es"), (r) => rows(r)[0]?.[0] === 12);
 expect("like + accents", run("SELECT herramienta FROM habilidades WHERE nivel LIKE 'avanz%'", es, messages, "es"), (r) => rows(r).length >= 2);
 expect("english names", run("SELECT company FROM experience WHERE current = true", en, messages, "en"), (r) => rows(r)[0]?.[0] === "PREDIQT");
 expect("mixed language names", run("select titulo from certifications where emisor = 'UNI'", es, messages, "es"), (r) => rows(r).length === 1);

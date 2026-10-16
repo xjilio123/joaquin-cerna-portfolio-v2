@@ -1,6 +1,7 @@
 import { certifications } from "./certifications";
 import { education, yearsOfStudy } from "./education";
 import { experience } from "./experience";
+import { skills } from "./skills";
 import type { LocalizedString } from "./types";
 
 export * from "./types";
@@ -8,6 +9,7 @@ export { profile } from "./profile";
 export { education, yearsOfStudy } from "./education";
 export { experience } from "./experience";
 export { skills } from "./skills";
+export { processSteps, sampleRows, sampleWeeks } from "./process";
 export {
   certifications,
   certificationTopics,
@@ -57,10 +59,10 @@ export const stats: Stat[] = [
     note: { es: "Ingeniería, USMP", en: "Engineering, USMP" },
   },
   {
-    id: "english",
-    value: "MET",
-    label: { es: "Inglés avanzado", en: "Advanced English" },
-    note: { es: "University of Michigan", en: "University of Michigan" },
+    id: "languages",
+    value: skills.find((group) => group.id === "languages")?.items.length ?? 0,
+    label: { es: "Idiomas", en: "Languages" },
+    note: { es: "Español nativo · inglés avanzado", en: "Native Spanish · advanced English" },
   },
 ];
 

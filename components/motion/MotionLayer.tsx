@@ -11,6 +11,7 @@ import { setLenis } from "@/lib/scroll";
  *   1. Lenis smooth scroll — mouse and trackpad only; touch keeps native momentum
  *   2. [data-scrub] paragraphs light up word by word as they scroll through
  *   3. [data-hscroll] pins and slides its [data-hscroll-track] sideways (lg+)
+ *   3b. [data-process] pins while its stage turns a raw table into a dashboard (lg+)
  *   4. [data-count] numbers count up the first time they are seen
  *   5. [data-tilt] elements lean towards the cursor in 3D
  *
@@ -89,8 +90,61 @@ export function MotionLayer() {
           );
         });
 
-        // 3 ── Horizontal experience, desktop only
+        // Pins are created in page order (Método comes before Experiencia) so
+        // each one measures its start after the spacer of the one above.
         const media = gsap.matchMedia();
+
+        // 3b ── Process story, desktop only: raw table → clean → star schema → dashboard
+        media.add("(min-width: 1024px)", () => {
+          const section = document.querySelector<HTMLElement>("[data-process]");
+          if (!section) return;
+          const q = gsap.utils.selector(section);
+          const bodies = q("[data-step-body]");
+          const dots = q("[data-process-dot]");
+          const DIM = 0.32;
+          const activate = (step: number, at: string) => {
+            tl.to(bodies, { opacity: (i: number) => (i === step ? 1 : DIM), duration: 0.3 }, at);
+            tl.to(dots[step], { borderColor: "var(--accent)", backgroundColor: "var(--accent)", duration: 0.2 }, at);
+          };
+
+          const tl = gsap.timeline({
+            defaults: { ease: "power2.inOut" },
+            scrollTrigger: { trigger: section, start: "top top", end: "+=320%", pin: true, scrub: 0.6, invalidateOnRefresh: true },
+          });
+          tl.set(bodies, { opacity: (i: number) => (i === 0 ? 1 : DIM) })
+            .set(dots[0], { borderColor: "var(--accent)", backgroundColor: "var(--accent)" })
+            .fromTo(q("[data-process-rail]"), { scaleY: 0 }, { scaleY: 1, ease: "none", duration: 4.6 }, 0)
+            .to({}, { duration: 0.5 }, 0);
+
+          // 02 Clean: wrong cells swap for their fixed value, unfixable rows get struck out.
+          tl.addLabel("clean", 0.6);
+          activate(1, "clean");
+          tl.to(q("[data-raw]"), { opacity: 0, y: -6, stagger: 0.04, duration: 0.35 }, "clean")
+            .fromTo(q("[data-clean]"), { opacity: 0, y: 6 }, { opacity: 1, y: 0, stagger: 0.04, duration: 0.35 }, "clean+=0.1")
+            .fromTo(q("[data-status]"), { opacity: 0 }, { opacity: 1, stagger: 0.05, duration: 0.3 }, "clean+=0.35")
+            .fromTo(q("[data-strike]"), { scaleX: 0 }, { scaleX: 1, stagger: 0.1, duration: 0.35 }, "clean+=0.5")
+            .to(q("[data-dropped]"), { opacity: 0.45, duration: 0.3 }, "clean+=0.6");
+
+          // 03 Model: the table folds into the fact table, the dimensions link in.
+          tl.addLabel("model", 2);
+          activate(2, "model");
+          tl.to(q('[data-layer="table"]'), { opacity: 0, scale: 0.55, duration: 0.45 }, "model")
+            .fromTo(q('[data-layer="model"]'), { opacity: 0 }, { opacity: 1, duration: 0.15 }, "model+=0.25")
+            .fromTo(q("[data-fact]"), { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.35 }, "model+=0.25")
+            .fromTo(q("[data-link]"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, stagger: 0.08, duration: 0.35 }, "model+=0.5")
+            .fromTo(q("[data-dim]"), { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, stagger: 0.08, duration: 0.3 }, "model+=0.65");
+
+          // 04 Decide: the model gives way to the dashboard; bars rise, KPI lands.
+          tl.addLabel("decide", 3.3);
+          activate(3, "decide");
+          tl.to(q('[data-layer="model"]'), { opacity: 0, scale: 0.92, duration: 0.35 }, "decide")
+            .fromTo(q('[data-layer="dash"]'), { opacity: 0 }, { opacity: 1, duration: 0.2 }, "decide+=0.2")
+            .fromTo(q("[data-bar]"), { scaleY: 0 }, { scaleY: 1, stagger: 0.06, duration: 0.4, ease: "power3.out" }, "decide+=0.3")
+            .fromTo(q("[data-kpi]"), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35 }, "decide+=0.55")
+            .to({}, { duration: 0.6 });
+        });
+
+        // 3 ── Horizontal experience, desktop only
         media.add("(min-width: 1024px)", () => {
           const section = document.querySelector<HTMLElement>("[data-hscroll]");
           const track = section?.querySelector<HTMLElement>("[data-hscroll-track]");
