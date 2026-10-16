@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect } from "react";
-import { applyStoredPreferences } from "@/lib/preferences";
+import { applyStoredPreferences, isReload } from "@/lib/preferences";
 import { markPageMounted } from "./use-theme-state";
 
 /**
@@ -13,6 +13,8 @@ export function PreferencesSync() {
   useLayoutEffect(() => {
     applyStoredPreferences();
     markPageMounted();
+    // The pre-paint script already turned off scroll restoration on a refresh; this makes sure.
+    if (isReload()) window.scrollTo(0, 0);
   }, []);
   return null;
 }

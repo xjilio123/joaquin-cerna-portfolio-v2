@@ -84,6 +84,24 @@ export function applyIntroState() {
 }
 
 /** The same logic as applyStoredPreferences, as a string for <head>. Keep in sync. */
+/**
+ * A refresh always starts at the top: no restored scroll position and no jump
+ * to the #section left in the address bar. Arriving through a link or a
+ * language switch (a "navigate", not a "reload") still lands on its section.
+ */
+export function isReload() {
+  try {
+    const entry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    return entry?.type === "reload";
+  } catch {
+    return false;
+  }
+}
+
+// The browser reads scrollRestoration from the entry as it was before the
+// refresh, so it is switched off on every load, ready for the next one.
+const RELOAD_TO_TOP = `try{history.scrollRestoration="manual";var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.hash)history.replaceState(history.state,"",location.pathname+location.search)}catch(e){}`;
+
 export const PREPAINT_SCRIPT = `(function(){var d=document.documentElement;try{var m=localStorage.getItem(${JSON.stringify(
   MODE_STORAGE_KEY,
 )});if(m!=="dark"&&m!=="light"){m=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}d.setAttribute("data-theme",m);d.style.colorScheme=m;var a=localStorage.getItem(${JSON.stringify(
@@ -92,4 +110,4 @@ export const PREPAINT_SCRIPT = `(function(){var d=document.documentElement;try{v
   DEFAULT_ACCENT,
 )}}d.setAttribute("data-accent",a)}catch(e){}var s=false;try{s=sessionStorage.getItem(${JSON.stringify(
   INTRO_STORAGE_KEY,
-)})==="1"}catch(e){}var r=matchMedia("(prefers-reduced-motion: reduce)").matches;if(s||r){d.setAttribute("data-intro","done");d.setAttribute("data-ready","")}else{d.setAttribute("data-intro","pending")}if(!r)d.setAttribute("data-hero-intro","")})();`;
+)})==="1"}catch(e){}var r=matchMedia("(prefers-reduced-motion: reduce)").matches;if(s||r){d.setAttribute("data-intro","done");d.setAttribute("data-ready","")}else{d.setAttribute("data-intro","pending")}if(!r)d.setAttribute("data-hero-intro","");${RELOAD_TO_TOP}})();`;
