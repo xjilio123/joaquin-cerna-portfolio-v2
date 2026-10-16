@@ -1,7 +1,7 @@
-import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { Lang } from "@/content/types";
 import { education, profile, stats } from "@/content";
+import { PortraitDots } from "@/components/about/PortraitDots";
 import { Section } from "@/components/ui/Section";
 import { t, tr } from "@/lib/i18n";
 
@@ -11,17 +11,10 @@ export function About({ lang, index }: { lang: Lang; index: number }) {
   return (
     <Section id="about" index={index} eyebrow={tr("nav.about", lang)} title={tr("about.title", lang)}>
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-8">
-        {/* Portrait: greyscale, washed in the accent colour so it follows the theme. */}
+        {/* Portrait: redrawn as accent-coloured dots; the photo underneath is the fallback. */}
         <figure data-reveal className="lg:col-span-4">
           <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-[#060607]">
-            <Image
-              src="/images/portrait-about.webp"
-              alt={tr("about.portraitAlt", lang)}
-              fill
-              sizes="(min-width: 1024px) 30vw, 100vw"
-              className="object-cover grayscale contrast-[1.15]"
-            />
-            <div aria-hidden className="absolute inset-0 bg-accent mix-blend-color opacity-60" />
+            <PortraitDots src="/images/portrait-about.webp" alt={tr("about.portraitAlt", lang)} sizes="(min-width: 1024px) 30vw, 100vw" />
             <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
             <figcaption className="absolute inset-x-5 bottom-5 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-white/80">
               <span>{tr("about.based", lang)}</span>
