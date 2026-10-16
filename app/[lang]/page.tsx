@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { lang } from "next/root-params";
+import { CommandPalette } from "@/components/command/CommandPalette";
+import { Preloader } from "@/components/intro/Preloader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Hero } from "@/components/sections/Hero";
@@ -12,6 +14,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <Preloader lang={locale} />
       <a
         href="#main"
         className="fixed left-4 top-4 z-[60] -translate-y-20 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-accent-fg transition-transform focus:translate-y-0"
@@ -32,6 +35,7 @@ export default async function HomePage() {
         ))}
       </main>
       <SiteFooter lang={locale} />
+      <CommandPalette lang={locale} />
     </>
   );
 }

@@ -38,9 +38,41 @@ export const ui = {
   "theme.accent.emerald": { es: "Esmeralda", en: "Emerald" },
   "theme.accent.graphite": { es: "Grafito", en: "Graphite" },
 
-  "hero.eyebrow": { es: "Data Analytics · BI · Lima", en: "Data Analytics · BI · Lima" },
+  "nav.openMenu": { es: "Abrir menú", en: "Open menu" },
+  "nav.closeMenu": { es: "Cerrar menú", en: "Close menu" },
+  "nav.menu": { es: "Menú", en: "Menu" },
+  "nav.search": { es: "Buscar", en: "Search" },
+
+  "intro.data": { es: "Datos", en: "Data" },
+  "intro.decisions": { es: "decisiones", en: "decisions" },
+
+  "hero.eyebrow": { es: "Data Analytics · BI · IA", en: "Data Analytics · BI · AI" },
   "hero.downloadCv": { es: "Descargar CV", en: "Download CV" },
   "hero.viewProjects": { es: "Ver proyectos", en: "View projects" },
+  "hero.sorting": { es: "Datos ordenados", en: "Data sorted" },
+  "hero.scrollHint": { es: "Desliza para ordenarlos", en: "Scroll to sort them" },
+  "hero.chartAlt": {
+    es: "Gráfico animado: puntos dispersos que se ordenan en una línea ascendente con los hitos de mi trayectoria.",
+    en: "Animated chart: scattered points that settle into a rising line marking the milestones of my career.",
+  },
+  "hero.localTime": { es: "Hora local en Lima", en: "Local time in Lima" },
+
+  "cmd.open": { es: "Abrir paleta de comandos", en: "Open command palette" },
+  "cmd.title": { es: "Paleta de comandos", en: "Command palette" },
+  "cmd.placeholder": { es: "Escribe un comando o una sección…", en: "Type a command or a section…" },
+  "cmd.empty": { es: "Sin resultados", en: "No results" },
+  "cmd.group.navigate": { es: "Ir a", en: "Go to" },
+  "cmd.group.preferences": { es: "Preferencias", en: "Preferences" },
+  "cmd.group.actions": { es: "Acciones", en: "Actions" },
+  "cmd.top": { es: "Inicio", en: "Top" },
+  "cmd.toLanguage": { es: "Cambiar a inglés", en: "Switch to Spanish" },
+  "cmd.accent": { es: "Color", en: "Colour" },
+  "cmd.copyEmail": { es: "Copiar correo", en: "Copy email" },
+  "cmd.copied": { es: "Correo copiado", en: "Email copied" },
+  "cmd.linkedin": { es: "Abrir LinkedIn", en: "Open LinkedIn" },
+  "cmd.hintNavigate": { es: "navegar", en: "navigate" },
+  "cmd.hintSelect": { es: "elegir", en: "select" },
+  "cmd.hintClose": { es: "cerrar", en: "close" },
 
   "section.building": {
     es: "Esta sección se construye en la fase 3 del rediseño.",

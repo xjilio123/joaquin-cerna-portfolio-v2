@@ -3,7 +3,7 @@
 import type { MouseEvent } from "react";
 import type { Lang } from "@/content/types";
 import { tr } from "@/lib/i18n";
-import { applyMode, useMode } from "./use-theme-state";
+import { switchMode, useMode } from "./use-theme-state";
 
 /**
  * Light/dark switch. The new mode is revealed as a circle growing out of the
@@ -16,37 +16,8 @@ export function ModeToggle({ lang }: { lang: Lang }) {
   const next = mode === "light" ? "dark" : "light";
 
   function onClick(event: MouseEvent<HTMLButtonElement>) {
-    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (typeof document.startViewTransition !== "function" || reduceMotion) {
-      applyMode(next);
-      return;
-    }
-
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-
-    const root = document.documentElement;
-    root.setAttribute("data-switching", "");
-    const transition = document.startViewTransition(() => applyMode(next));
-
-    transition.ready
-      .then(() => {
-        root.animate(
-          {
-            clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`],
-          },
-          {
-            duration: 650,
-            easing: "cubic-bezier(0.65, 0, 0.35, 1)",
-            pseudoElement: "::view-transition-new(root)",
-          },
-        );
-      })
-      .catch(() => {});
-
-    transition.finished.finally(() => root.removeAttribute("data-switching"));
+    switchMode(next, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
   }
 
   return (
