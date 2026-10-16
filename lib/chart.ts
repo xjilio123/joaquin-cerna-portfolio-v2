@@ -2,8 +2,12 @@ import { milestones } from "@/content/milestones";
 
 /**
  * Geometry of the hero chart, shared by the WebGL particle field and the DOM
- * labels so both land on exactly the same points. Coordinates are normalised
- * to the hero viewport: x 0 → 1 left to right, y 0 → 1 top to bottom.
+ * markers so both land on exactly the same points.
+ *
+ * The chart lives in a real layout box ([data-chart-box] in the hero): on
+ * phones it takes the free space between the header and the text, on desktop
+ * the upper-right quadrant. Coordinates here are normalised to that box, so
+ * the chart can never overlap the copy whatever the screen height.
  */
 export interface ChartRect {
   x0: number;
@@ -14,10 +18,8 @@ export interface ChartRect {
   y1: number;
 }
 
-/** Desktop: upper-right quadrant, clear of the name. */
-export const CHART_DESKTOP: ChartRect = { x0: 0.57, x1: 0.93, y0: 0.16, y1: 0.5 };
-/** Below lg: a band across the top, above the text block. */
-export const CHART_MOBILE: ChartRect = { x0: 0.18, x1: 0.9, y0: 0.15, y1: 0.33 };
+/** The plot area inside the chart box; the margins leave room for the year labels. */
+export const CHART_INNER: ChartRect = { x0: 0.12, x1: 0.97, y0: 0.16, y1: 0.94 };
 
 export const CHART_BREAKPOINT = "(min-width: 1024px)";
 

@@ -20,8 +20,8 @@ export const education: EducationEntry[] = [
     institution: "Instituto Cultural Peruano Norteamericano (ICPNA)",
     location: { es: "Lima, Perú", en: "Lima, Peru" },
     program: {
-      es: "Inglés Avanzado — Certificación MET (University of Michigan)",
-      en: "Advanced English — MET certification (University of Michigan)",
+      es: "Inglés avanzado — formación vinculada a la certificación MET (University of Michigan)",
+      en: "Advanced English — training linked to the MET certification (University of Michigan)",
     },
     period: { es: "Enero 2018 — 2021", en: "January 2018 — 2021" },
   },

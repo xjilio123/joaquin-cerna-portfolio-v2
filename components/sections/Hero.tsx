@@ -24,7 +24,7 @@ export function Hero({ lang }: { lang: Lang }) {
     <section id="top" data-hero className="relative h-[165svh] lg:h-[200svh]">
       <div
         data-hero-stage
-        className="sticky top-0 flex h-svh flex-col justify-end overflow-hidden px-5 pb-8 pt-28 sm:px-8 lg:px-16 lg:pb-12"
+        className="sticky top-0 flex h-svh flex-col justify-end overflow-hidden px-5 pb-8 pt-20 sm:px-8 lg:px-16 lg:pb-12 lg:pt-28"
       >
         {/* Dot grid, faded towards the edges: the ground the data lives on. */}
         <div
@@ -38,20 +38,28 @@ export function Hero({ lang }: { lang: Lang }) {
 
         <div role="img" aria-label={tr("hero.chartAlt", lang)} className="absolute inset-0">
           <ParticleField />
+        </div>
+
+        {/* The chart's own box: the free space above the copy on phones, the
+            upper-right quadrant on desktop. Particles and markers both read it. */}
+        <div
+          data-chart-box
+          className="relative mb-6 min-h-28 flex-1 [@media(max-height:720px)]:mb-3 lg:absolute lg:left-[53%] lg:top-[13%] lg:mb-0 lg:h-[40%] lg:w-[42%] lg:flex-none"
+        >
           <ChartLabels lang={lang} />
         </div>
 
-        <div className="relative">
+        <div data-hero-copy className="relative">
           <p data-scramble className="reveal font-mono text-xs uppercase tracking-[0.25em] text-accent sm:text-sm" style={delay(0)}>
             {tr("hero.eyebrow", lang)}
           </p>
 
-          <div className="mt-5">
+          <div className="mt-3 sm:mt-5">
             <HeroName />
           </div>
 
           <div
-            className="reveal mt-8 flex flex-col gap-8 border-t border-line pt-7 lg:flex-row lg:items-end lg:justify-between"
+            className="reveal mt-6 flex flex-col gap-6 border-t border-line pt-5 sm:mt-8 sm:gap-8 sm:pt-7 [@media(max-height:720px)]:mt-4 [@media(max-height:720px)]:gap-4 [@media(max-height:720px)]:pt-4 lg:flex-row lg:items-end lg:justify-between"
             style={delay(450)}
           >
             <div className="max-w-2xl">
@@ -61,7 +69,7 @@ export function Hero({ lang }: { lang: Lang }) {
                   {payoff}
                 </span>
               </p>
-              <p className="mt-3 text-base leading-relaxed text-muted sm:text-lg">{t(profile.tagline, lang)}</p>
+              <p className="mt-3 text-base leading-relaxed text-muted sm:text-lg [@media(max-height:720px)]:hidden">{t(profile.tagline, lang)}</p>
             </div>
 
             <div className="flex flex-wrap gap-3">
@@ -69,7 +77,7 @@ export function Hero({ lang }: { lang: Lang }) {
                 <a
                   href={profile.cvPath}
                   download={profile.cvFileName}
-                  className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-accent-fg"
+                  className="inline-flex h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-accent-fg sm:h-12 sm:px-6"
                 >
                   {tr("hero.downloadCv", lang)}
                   <svg aria-hidden viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -80,7 +88,7 @@ export function Hero({ lang }: { lang: Lang }) {
               <Magnetic>
                 <a
                   href="#projects"
-                  className="inline-flex h-12 items-center rounded-full border border-line px-6 text-sm font-semibold text-fg transition-colors duration-300 hover:border-fg"
+                  className="inline-flex h-11 items-center rounded-full border border-line px-5 text-sm font-semibold text-fg sm:h-12 sm:px-6 transition-colors duration-300 hover:border-fg"
                 >
                   {tr("hero.viewProjects", lang)}
                 </a>
@@ -89,7 +97,7 @@ export function Hero({ lang }: { lang: Lang }) {
           </div>
 
           <div
-            className="reveal mt-8 flex items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted sm:text-xs"
+            className="reveal mt-6 flex items-center justify-between gap-4 sm:mt-8 [@media(max-height:720px)]:mt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted sm:text-xs"
             style={delay(650)}
           >
             <LimaClock label={tr("hero.localTime", lang)} />

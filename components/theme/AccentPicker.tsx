@@ -65,7 +65,7 @@ export function AccentPicker({ lang }: { lang: Lang }) {
               title={tr(`theme.accent.${name}`, lang)}
               tabIndex={open ? 0 : -1}
               onClick={() => switchAccent(name)}
-              className="grid size-9 place-items-center rounded-full transition-transform duration-300 ease-out-expo hover:scale-110"
+              className="grid size-10 place-items-center rounded-full transition-transform duration-300 ease-out-expo hover:scale-110"
             >
               <span
                 className="size-6 rounded-full transition-shadow duration-300"

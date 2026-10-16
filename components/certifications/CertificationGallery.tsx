@@ -34,7 +34,7 @@ function Chip({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors duration-300 ${
+      className={`min-h-10 rounded-full border px-4 py-2 text-sm transition-colors duration-300 ${
         active ? "border-accent bg-accent text-accent-fg" : "border-line text-muted hover:border-fg hover:text-fg"
       }`}
     >

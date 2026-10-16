@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { milestones } from "@/content/milestones";
-import { CHART_BREAKPOINT, CHART_DESKTOP, CHART_MOBILE, chartPoint, type ChartRect } from "@/lib/chart";
+import { CHART_BREAKPOINT, CHART_INNER, chartPoint, type ChartRect } from "@/lib/chart";
 
 /*
  * The hero's particle field.
@@ -29,6 +29,7 @@ uniform float uProgress;
 uniform float uIntro;
 uniform float uDpr;
 uniform float uMotion;
+uniform float uScale;
 
 varying float vAlpha;
 varying float vSettled;
@@ -59,10 +60,12 @@ void main() {
   gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
 
   float kind = aTarget.z;
-  float settledSize = kind > 1.5 ? 6.0 : (kind > 0.5 ? 2.6 : 1.9);
-  gl_PointSize = mix(1.4 + aScatter.z * 2.4, settledSize, p) * uDpr;
+  float settledSize = kind > 1.5 ? 4.0 : (kind > 0.5 ? 2.4 : 1.8);
+  gl_PointSize = mix(1.4 + aScatter.z * 2.4, settledSize, p) * uDpr * uScale;
 
-  float settledAlpha = kind > 1.5 ? 1.0 : (kind > 0.5 ? 0.9 : 0.3);
+  // Milestones stay soft: the crisp marker is a DOM ring (ChartLabels); stacked
+  // additive particles would otherwise burn out to a white blob.
+  float settledAlpha = kind > 1.5 ? 0.45 : (kind > 0.5 ? 0.85 : 0.3);
   vAlpha = mix(0.22 + aScatter.z * 0.5, settledAlpha, p) * intro;
   vSettled = p;
 }
@@ -83,7 +86,7 @@ void main() {
 }
 `;
 
-const MILESTONE_SHARE = 0.05;
+const MILESTONE_SHARE = 0.025;
 const LINE_SHARE = 0.55;
 
 function gaussian() {
@@ -178,15 +181,41 @@ export function ParticleField() {
     const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
     const count = Math.round((desktopQuery.matches ? 2600 : 1400) * (lowPower ? 0.5 : 1));
 
-    // Per-particle constants.
-    const scatter = new Float32Array(count * 3);
+    // The plot area: the chart box's inner rect, mapped into canvas-normalised
+    // coordinates. Measured from the layout, so it follows the real space the
+    // hero leaves for the chart on every screen.
+    const box = stage.querySelector<HTMLElement>("[data-chart-box]");
+    const plotRect = (): ChartRect => {
+      const c = canvas.getBoundingClientRect();
+      const b = (box ?? canvas).getBoundingClientRect();
+      const nx = (px: number) => (px - c.left) / Math.max(1, c.width);
+      const ny = (py: number) => (py - c.top) / Math.max(1, c.height);
+      return {
+        x0: nx(b.left + CHART_INNER.x0 * b.width),
+        x1: nx(b.left + CHART_INNER.x1 * b.width),
+        y0: ny(b.top + CHART_INNER.y0 * b.height),
+        y1: ny(b.top + CHART_INNER.y1 * b.height),
+      };
+    };
+
+    // Per-particle constants. On desktop the cloud fills the screen; below lg it
+    // gathers in the band around the chart, so it never sits behind the text.
+    const scatterSeed = new Float32Array(count * 3).map(() => Math.random());
+    const buildScatter = (desktop: boolean, rect: ChartRect) => {
+      const out = new Float32Array(count * 3);
+      const top = desktop ? -0.05 : rect.y0 - 0.08;
+      const span = desktop ? 1.1 : rect.y1 - rect.y0 + 0.14;
+      for (let i = 0; i < count; i++) {
+        out[i * 3] = scatterSeed[i * 3] * 1.1 - 0.05;
+        out[i * 3 + 1] = top + scatterSeed[i * 3 + 1] * span;
+        out[i * 3 + 2] = scatterSeed[i * 3 + 2];
+      }
+      return out;
+    };
     const seeds = new Float32Array(count);
     const kinds = new Float32Array(count);
     const picks = new Float32Array(count);
     for (let i = 0; i < count; i++) {
-      scatter[i * 3] = Math.random() * 1.1 - 0.05;
-      scatter[i * 3 + 1] = Math.random() * 1.1 - 0.05;
-      scatter[i * 3 + 2] = Math.random();
       seeds[i] = Math.random();
       const r = Math.random();
       kinds[i] = r < MILESTONE_SHARE ? 2 : r < MILESTONE_SHARE + LINE_SHARE ? 1 : 0;
@@ -203,25 +232,13 @@ export function ParticleField() {
       return buffer;
     };
 
-    bind("aScatter", scatter, 3);
+    const initialRect = plotRect();
+    const scatterBuffer = bind("aScatter", buildScatter(desktopQuery.matches, initialRect), 3);
     bind("aSeed", seeds, 1);
-    const targetBuffer = bind(
-      "aTarget",
-      buildTargets(count, desktopQuery.matches ? CHART_DESKTOP : CHART_MOBILE, kinds, picks),
-      3,
-    );
-
-    const onBreakpoint = () => {
-      gl.bindBuffer(gl.ARRAY_BUFFER, targetBuffer);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        buildTargets(count, desktopQuery.matches ? CHART_DESKTOP : CHART_MOBILE, kinds, picks),
-        gl.STATIC_DRAW,
-      );
-    };
-    desktopQuery.addEventListener("change", onBreakpoint);
+    const targetBuffer = bind("aTarget", buildTargets(count, initialRect, kinds, picks), 3);
 
     const u = (name: string) => gl.getUniformLocation(program, name);
+    const uScale = u("uScale");
     const uRes = u("uRes");
     const uMouse = u("uMouse");
     const uTime = u("uTime");
@@ -231,6 +248,26 @@ export function ParticleField() {
     const uMotion = u("uMotion");
     const uAccent = u("uAccent");
     const uMuted = u("uMuted");
+
+    // Re-target the particles whenever the chart box moves or resizes.
+    let geometryKey = "";
+    const updateGeometry = () => {
+      const desktop = desktopQuery.matches;
+      const rect = plotRect();
+      const key = [desktop, rect.x0, rect.x1, rect.y0, rect.y1].map((v) => (typeof v === "number" ? v.toFixed(3) : v)).join();
+      if (key === geometryKey) return;
+      geometryKey = key;
+      gl.bindBuffer(gl.ARRAY_BUFFER, scatterBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, buildScatter(desktop, rect), gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, targetBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, buildTargets(count, rect, kinds, picks), gl.STATIC_DRAW);
+      gl.uniform1f(uScale, desktop ? 1 : 0.8);
+    };
+    updateGeometry();
+    desktopQuery.addEventListener("change", updateGeometry);
+    const geometryObserver = new ResizeObserver(updateGeometry);
+    geometryObserver.observe(canvas);
+    if (box) geometryObserver.observe(box);
 
     gl.uniform1f(uMotion, reduceMotion ? 0 : 1);
     gl.enable(gl.BLEND);
@@ -373,7 +410,8 @@ export function ParticleField() {
       themeObserver.disconnect();
       intersection.disconnect();
       resizeObserver.disconnect();
-      desktopQuery.removeEventListener("change", onBreakpoint);
+      desktopQuery.removeEventListener("change", updateGeometry);
+      geometryObserver.disconnect();
       window.removeEventListener("scroll", measure);
       window.removeEventListener("resize", measure);
       window.removeEventListener("pointermove", onPointerMove);

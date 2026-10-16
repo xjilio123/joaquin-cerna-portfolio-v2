@@ -33,8 +33,8 @@ export const profile = {
   } satisfies { es: string[]; en: string[] },
 
   tagline: {
-    es: "Analytics, Business Intelligence y automatización — desde el proceso ETL hasta el dashboard que alguien usa para decidir.",
-    en: "Analytics, Business Intelligence and automation — from the ETL process to the dashboard someone actually decides with.",
+    es: "Analytics, Business Intelligence e IA — desde el proceso ETL hasta el dashboard que alguien usa para decidir.",
+    en: "Analytics, Business Intelligence and AI — from the ETL process to the dashboard someone actually decides with.",
   } satisfies LocalizedString,
 
   /** Opening statement of the About section, set large. */
@@ -44,14 +44,14 @@ export const profile = {
   } satisfies LocalizedString,
 
   bio: {
-    es: "Mi enfoque es Data Analytics, Business Intelligence y automatización de procesos. Tengo experiencia en procesos ETL, limpieza y transformación de datos, modelado dimensional y diseño de dashboards interactivos. Manejo SQL, Power BI y Excel a nivel avanzado para análisis y visualización de KPIs, y Python para análisis exploratorio (EDA) y automatización. Trabajo con Scrum y control de versiones en GitHub.",
-    en: "My focus is Data Analytics, Business Intelligence and process automation. I have hands-on experience with ETL processes, data cleaning and transformation, dimensional modeling and interactive dashboard design. I use SQL, Power BI and Excel at an advanced level for analysis and KPI visualization, and Python for exploratory data analysis (EDA) and automation. I work with Scrum and version control on GitHub.",
+    es: "Mi enfoque es Data Analytics, Business Intelligence e Inteligencia Artificial. Tengo experiencia en extracción, transformación y análisis de datos con SQL y Python, modelado de datos y dashboards en Power BI para el seguimiento de KPIs. Trabajo con análisis exploratorio, automatización de tareas, IA generativa, modelos de lenguaje (LLM) y técnicas de prompting, con metodologías ágiles y control de versiones en GitHub. Me interesa construir soluciones analíticas y de IA aplicadas a procesos de negocio y plataformas cloud.",
+    en: "My focus is Data Analytics, Business Intelligence and Artificial Intelligence. I have hands-on experience extracting, transforming and analysing data with SQL and Python, modelling data and building Power BI dashboards to track KPIs. I work with exploratory analysis, task automation, generative AI, large language models (LLMs) and prompting techniques, using agile methods and version control on GitHub. I want to build analytics and AI solutions applied to business processes and cloud platforms.",
   } satisfies LocalizedString,
 
   /** Condensed version used for metadata and the OG image. */
   metaDescription: {
-    es: "Portafolio de Joaquín Cerna Rojas — Data Analytics, Business Intelligence y automatización. Procesos ETL, modelado dimensional y dashboards con Power BI, SQL y Python.",
-    en: "Portfolio of Joaquín Cerna Rojas — Data Analytics, Business Intelligence and automation. ETL processes, dimensional modeling and dashboards with Power BI, SQL and Python.",
+    es: "Portafolio de Joaquín Cerna Rojas — Data Analytics, Business Intelligence e IA. Procesos ETL, modelado de datos y dashboards con Power BI, SQL y Python; IA generativa y LLM.",
+    en: "Portfolio of Joaquín Cerna Rojas — Data Analytics, Business Intelligence and AI. ETL processes, data modeling and dashboards with Power BI, SQL and Python; generative AI and LLMs.",
   } satisfies LocalizedString,
 
   cvPath: "/cv/JOAQUIN_CERNA_ROJAS_CV.pdf",

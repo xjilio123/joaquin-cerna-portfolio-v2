@@ -38,7 +38,7 @@ export function LangToggle({ lang }: { lang: Lang }) {
             lang={code}
             aria-current={active ? "true" : undefined}
             onClick={(event) => onClick(event, code)}
-            className={`rounded-full px-3 py-2 font-mono text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+            className={`grid h-10 min-w-10 place-items-center rounded-full px-3 font-mono text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
               active ? "bg-accent text-accent-fg" : "text-muted hover:text-fg"
             }`}
           >

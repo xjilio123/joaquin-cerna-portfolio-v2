@@ -1,39 +1,68 @@
 import type { ExperienceEntry } from "./types";
 
-/** Ordered newest first. `start` exists purely to keep that ordering explicit. */
+/**
+ * Ordered newest first. `start` exists purely to keep that ordering explicit.
+ * Wording mirrors the published CV (public/cv), so the two never disagree.
+ */
 export const experience: ExperienceEntry[] = [
   {
     id: "prediqt",
     company: "PREDIQT",
     role: {
-      es: "Practicante Profesional de Data Analytics e IA — Cloud & Analytics",
-      en: "Data Analytics & AI Professional Intern — Cloud & Analytics",
+      es: "Practicante Profesional de Data Analytics e IA",
+      en: "Data Analytics & AI Professional Intern",
     },
     period: { es: "Agosto 2026 — Actualidad", en: "August 2026 — Present" },
     start: "2026-08-20",
     bullets: [
       {
-        es: "Apoyo en la extracción, transformación y análisis de datos junto a consultores senior.",
-        en: "Support data extraction, transformation and analysis alongside senior consultants.",
+        es: "Apoyo en la extracción, limpieza, transformación y análisis de datos para atender requerimientos de negocio.",
+        en: "Support data extraction, cleaning, transformation and analysis to meet business requirements.",
       },
       {
-        es: "Colaboro en la elaboración de reportes y visualizaciones.",
-        en: "Help build reports and visualizations.",
+        es: "Colaboro en la elaboración de reportes, visualizaciones y dashboards para el análisis de información e indicadores.",
+        en: "Help build reports, visualizations and dashboards to analyse information and indicators.",
       },
       {
-        es: "Participo en iniciativas de IA generativa y automatización.",
-        en: "Take part in generative AI and automation initiatives.",
+        es: "Participo en iniciativas de IA generativa, modelos de lenguaje (LLM), prompting y exploración de agentes de IA.",
+        en: "Take part in generative AI initiatives: large language models (LLMs), prompting and AI agent exploration.",
       },
       {
-        es: "Apoyo en proyectos desarrollados sobre plataformas cloud.",
-        en: "Support projects built on cloud platforms.",
+        es: "Apoyo en la evaluación de herramientas de automatización y soluciones de analítica basadas en plataformas cloud.",
+        en: "Help evaluate automation tools and analytics solutions built on cloud platforms.",
       },
       {
-        es: "Investigo nuevas herramientas y tendencias de Data & Analytics y Agentic AI.",
-        en: "Research new tools and trends in Data & Analytics and Agentic AI.",
+        es: "Investigo herramientas y tendencias de Data Analytics, IA y Agentic AI para identificar oportunidades de aplicación.",
+        en: "Research Data Analytics, AI and Agentic AI tools and trends to identify where they can be applied.",
       },
     ],
-    stack: ["SQL", "Python", "IA generativa", "Agentic AI", "Cloud"],
+    stack: ["SQL", "Python", "IA generativa", "LLM", "Agentic AI", "Cloud"],
+  },
+  {
+    id: "jpc-garrita",
+    company: "JPC Garrita",
+    role: { es: "Analista de Datos — Proyecto", en: "Data Analyst — Project" },
+    period: { es: "Agosto 2025 — Noviembre 2025", en: "August 2025 — November 2025" },
+    start: "2025-08-01",
+    bullets: [
+      {
+        es: "Desarrollé procesos ETL (extracción, transformación y carga) con Python y SQL para preparar datos para su análisis.",
+        en: "Built ETL (extract, transform, load) processes with Python and SQL to prepare data for analysis.",
+      },
+      {
+        es: "Estructuré modelos dimensionales para facilitar la consulta y el análisis de información.",
+        en: "Structured dimensional models to make information easier to query and analyse.",
+      },
+      {
+        es: "Construí dashboards interactivos en Power BI para visualizar indicadores clave de desempeño (KPIs).",
+        en: "Built interactive Power BI dashboards to visualise key performance indicators (KPIs).",
+      },
+      {
+        es: "Realicé análisis exploratorio de datos (EDA) para identificar patrones, tendencias y oportunidades de análisis.",
+        en: "Performed exploratory data analysis (EDA) to identify patterns, trends and analysis opportunities.",
+      },
+    ],
+    stack: ["Python", "SQL", "Power BI", "ETL", "Modelado dimensional"],
   },
   {
     id: "usmp-derecho",
@@ -46,74 +75,51 @@ export const experience: ExperienceEntry[] = [
     start: "2025-06-01",
     bullets: [
       {
-        es: "Aseguré la continuidad operativa mediante instalación, configuración y mantenimiento de equipos y sistemas.",
-        en: "Ensured operational continuity through installation, configuration and maintenance of equipment and systems.",
+        es: "Contribuí a la continuidad operativa con la instalación, configuración y mantenimiento de equipos y sistemas.",
+        en: "Kept operations running by installing, configuring and maintaining equipment and systems.",
       },
       {
-        es: "Brindé soporte técnico a usuarios resolviendo incidencias de hardware y software.",
-        en: "Provided technical support to users, resolving hardware and software incidents.",
+        es: "Atendí incidencias de hardware y software, brindando soporte técnico a usuarios.",
+        en: "Resolved hardware and software incidents, providing technical support to users.",
       },
       {
-        es: "Gestioné la comunicación institucional mediante Outlook.",
-        en: "Managed institutional communication through Outlook.",
+        es: "Gestioné comunicaciones institucionales en Microsoft Outlook y apoyé en tareas operativas del área.",
+        en: "Managed institutional communications in Microsoft Outlook and supported the unit's daily operations.",
       },
       {
-        es: "Documenté procedimientos técnicos para optimizar los tiempos de respuesta.",
-        en: "Documented technical procedures to reduce response times.",
+        es: "Documenté procedimientos técnicos para estandarizar actividades y facilitar la atención de incidencias.",
+        en: "Documented technical procedures to standardise work and speed up incident handling.",
       },
     ],
     stack: ["Windows", "Outlook", "Hardware", "Soporte N1-N2"],
   },
   {
-    id: "jpc-garrita",
-    company: "JPC Garrita",
-    role: { es: "Analista de Datos", en: "Data Analyst" },
-    period: { es: "Agosto 2025 — Noviembre 2025", en: "August 2025 — November 2025" },
-    start: "2025-08-01",
-    bullets: [
-      {
-        es: "Ejecuté procesos ETL (extracción, transformación y carga) utilizando Python y SQL.",
-        en: "Executed ETL processes (extract, transform, load) using Python and SQL.",
-      },
-      {
-        es: "Diseñé modelos dimensionales para el análisis de información.",
-        en: "Designed dimensional models for information analysis.",
-      },
-      {
-        es: "Desarrollé dashboards interactivos en Power BI para la visualización de KPIs.",
-        en: "Developed interactive Power BI dashboards for KPI visualization.",
-      },
-      {
-        es: "Realicé análisis exploratorio de datos (EDA) para identificar patrones y tendencias.",
-        en: "Performed exploratory data analysis (EDA) to identify patterns and trends.",
-      },
-    ],
-    stack: ["Python", "SQL", "Power BI", "ETL", "Modelado dimensional"],
-  },
-  {
     id: "na-vishe",
     company: "Ña Vishe",
-    role: { es: "Quality Assurance (QA)", en: "Quality Assurance (QA)" },
+    role: {
+      es: "Practicante de Quality Assurance (QA) — Proyecto",
+      en: "Quality Assurance (QA) Intern — Project",
+    },
     period: { es: "Marzo 2025 — Junio 2025", en: "March 2025 — June 2025" },
     start: "2025-03-01",
     bullets: [
       {
-        es: "Implementé pruebas automatizadas utilizando Playwright, NodeJS y TypeScript.",
-        en: "Implemented automated tests using Playwright, NodeJS and TypeScript.",
+        es: "Implementé pruebas automatizadas con Playwright, Node.js y TypeScript para validar el comportamiento de la aplicación.",
+        en: "Implemented automated tests with Playwright, Node.js and TypeScript to validate the application's behaviour.",
       },
       {
-        es: "Apliqué metodología Scrum para la gestión de tareas.",
-        en: "Applied Scrum methodology for task management.",
+        es: "Ejecuté pruebas funcionales y de regresión en Chromium para detectar posibles defectos.",
+        en: "Ran functional and regression tests in Chromium to catch defects.",
       },
       {
-        es: "Gestioné el control de versiones mediante GitHub.",
-        en: "Managed version control via GitHub.",
+        es: "Organicé las tareas siguiendo prácticas ágiles y la metodología Scrum.",
+        en: "Organised work following agile practices and the Scrum methodology.",
       },
       {
-        es: "Ejecuté pruebas funcionales y de regresión en entorno Chromium.",
-        en: "Executed functional and regression tests in a Chromium environment.",
+        es: "Gestioné el control de versiones y la colaboración en el código mediante GitHub.",
+        en: "Managed version control and code collaboration on GitHub.",
       },
     ],
-    stack: ["Playwright", "TypeScript", "NodeJS", "GitHub", "Scrum"],
+    stack: ["Playwright", "TypeScript", "Node.js", "GitHub", "Scrum"],
   },
 ];
