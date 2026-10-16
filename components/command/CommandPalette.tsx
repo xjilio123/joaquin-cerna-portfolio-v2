@@ -7,6 +7,7 @@ import { profile } from "@/content";
 import { applyAccent, currentMode, switchMode, useMode } from "@/components/theme/use-theme-state";
 import { COMMAND_EVENT } from "@/lib/command";
 import { SECTIONS, tr } from "@/lib/i18n";
+import { flagLanguageSwitch, scrollToId } from "@/lib/scroll";
 import { ACCENTS } from "@/lib/preferences";
 
 type Group = "navigate" | "preferences" | "actions";
@@ -51,10 +52,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
 
   const commands = useMemo<Command[]>(() => {
     const other: Lang = lang === "es" ? "en" : "es";
-    const go = (hash: string) => () => {
-      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth" });
-      history.replaceState(null, "", `#${hash}`);
-    };
+    const go = (hash: string) => () => scrollToId(hash);
     return [
       { id: "top", group: "navigate", label: tr("cmd.top", lang), keywords: "home inicio hero", run: go("top") },
       ...SECTIONS.map<Command>((section) => ({
@@ -89,6 +87,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
         keywords: "idioma language english espanol ingles",
         run: () => {
           const target = pathname.replace(/^\/(es|en)(?=\/|$)/, `/${other}`) || `/${other}`;
+          flagLanguageSwitch();
           router.push(target + window.location.hash, { scroll: false });
         },
       },
@@ -199,6 +198,7 @@ export function CommandPalette({ lang }: { lang: Lang }) {
     <dialog
       ref={dialogRef}
       aria-label={tr("cmd.title", lang)}
+      data-lenis-prevent
       className="sheet mx-auto mt-[12vh] w-[min(92vw,600px)]"
       onClose={() => {
         setQuery("");

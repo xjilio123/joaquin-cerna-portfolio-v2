@@ -153,9 +153,10 @@ export function CertificationGallery({ lang }: { lang: Lang }) {
               <li key={certification.id}>
                 <button
                   type="button"
+                  data-tilt
                   onClick={() => show(certification)}
                   aria-label={`${tr("certifications.open", lang)}: ${t(certification.title, lang)}`}
-                  className="group flex size-full flex-col overflow-hidden rounded-3xl border border-line bg-surface text-left transition-[border-color,transform] duration-500 ease-out-expo hover:-translate-y-1 hover:border-accent/60"
+                  className="group flex size-full flex-col overflow-hidden rounded-3xl border border-line bg-surface text-left transition-[border-color,translate] duration-500 ease-out-expo hover:-translate-y-1 hover:border-accent/60"
                 >
                   <div className="relative aspect-[16/11] w-full overflow-hidden bg-[#f4f2ec]">
                     {cover ? (
@@ -195,6 +196,7 @@ export function CertificationGallery({ lang }: { lang: Lang }) {
       <dialog
         ref={dialogRef}
         aria-label={open ? t(open.title, lang) : tr("certifications.open", lang)}
+        data-lenis-prevent
         className="sheet m-auto w-[min(94vw,1100px)]"
         onKeyDown={onDialogKey}
         onClose={() => setOpen(null)}

@@ -12,6 +12,9 @@ import { Experience } from "@/components/sections/Experience";
 import { Hero } from "@/components/sections/Hero";
 import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
+import { CustomCursor } from "@/components/motion/CustomCursor";
+import { MotionLayer } from "@/components/motion/MotionLayer";
+import { ScrambleIn } from "@/components/motion/ScrambleIn";
 import { RevealObserver } from "@/components/ui/RevealObserver";
 import { isLocale, tr } from "@/lib/i18n";
 
@@ -42,6 +45,9 @@ export default async function HomePage() {
       <SiteFooter lang={locale} />
       <CommandPalette lang={locale} />
       <RevealObserver />
+      <MotionLayer />
+      <ScrambleIn />
+      <CustomCursor />
     </>
   );
 }

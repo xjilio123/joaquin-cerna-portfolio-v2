@@ -124,6 +124,7 @@ export function Skills({ lang, index }: { lang: Lang; index: number }) {
   const groups = skills
     .map((group) => ({ ...group, items: group.items.filter((item) => !item.featured) }))
     .filter((group) => group.items.length > 0);
+  const marquee = skills.filter((group) => group.id !== "languages").flatMap((group) => group.items.map((item) => item.name));
 
   return (
     <Section
@@ -140,7 +141,28 @@ export function Skills({ lang, index }: { lang: Lang; index: number }) {
         ))}
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Every tool on one endless strip; it pauses under the cursor. */}
+      <div
+        aria-hidden
+        className="group relative -mx-5 my-12 overflow-hidden py-2 [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)] sm:-mx-8 lg:-mx-16"
+      >
+        <div className="flex w-max animate-[marquee_45s_linear_infinite] group-hover:[animation-play-state:paused]">
+          {[0, 1].map((copy) => (
+            <div key={copy} className="flex shrink-0 items-center">
+              {marquee.map((name) => (
+                <span key={name} className="flex items-center">
+                  <span className="px-6 font-display text-3xl font-semibold tracking-[-0.02em] text-muted transition-colors hover:text-fg sm:text-4xl">
+                    {name}
+                  </span>
+                  <span className="text-accent">/</span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map((group, i) => (
           <article key={group.id} data-reveal style={delay((i % 3) * 80)} className="rounded-3xl border border-line p-6 sm:p-7">
             <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-muted">{t(group.label, lang)}</h3>

@@ -40,22 +40,24 @@ export function CvSection({ lang, index }: { lang: Lang; index: number }) {
           <p className="mt-8 max-w-md text-sm text-muted">{tr("cv.noteRedacted", lang)}</p>
         </div>
 
-        {/* Two pages fanned out; they straighten when hovered. */}
-        <a
-          href={profile.cvPath}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={tr("cv.openInTab", lang)}
-          data-reveal
-          className="group relative mx-auto block w-full max-w-xl lg:col-span-7"
-        >
-          <div className="relative aspect-[1100/1556] w-[78%] translate-x-[22%] rotate-[5deg] overflow-hidden rounded-2xl border border-line bg-white shadow-2xl shadow-black/25 transition-transform duration-700 ease-out-expo group-hover:translate-x-[26%] group-hover:rotate-[7deg]">
-            <Image src="/cv/preview-2.webp" alt={`${tr("cv.previewAlt", lang)} 2`} fill sizes="(min-width: 1024px) 30vw, 70vw" className="object-cover" />
-          </div>
-          <div className="absolute left-0 top-0 aspect-[1100/1556] w-[78%] -rotate-[3deg] overflow-hidden rounded-2xl border border-line bg-white shadow-2xl shadow-black/30 transition-transform duration-700 ease-out-expo group-hover:-translate-y-2 group-hover:rotate-0">
-            <Image src="/cv/preview-1.webp" alt={`${tr("cv.previewAlt", lang)} 1`} fill sizes="(min-width: 1024px) 30vw, 70vw" className="object-cover" />
-          </div>
-        </a>
+        {/* Two pages fanned out; they straighten on hover and the pair tilts towards the cursor. */}
+        <div data-reveal className="w-full lg:col-span-7">
+          <a
+            href={profile.cvPath}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={tr("cv.openInTab", lang)}
+            data-tilt="strong"
+            className="group relative mx-auto block w-full max-w-xl"
+          >
+            <div className="relative aspect-[1100/1556] w-[78%] translate-x-[22%] rotate-[5deg] overflow-hidden rounded-2xl border border-line bg-white shadow-2xl shadow-black/25 transition-transform duration-700 ease-out-expo group-hover:translate-x-[26%] group-hover:rotate-[7deg]">
+              <Image src="/cv/preview-2.webp" alt={`${tr("cv.previewAlt", lang)} 2`} fill sizes="(min-width: 1024px) 30vw, 70vw" className="object-cover" />
+            </div>
+            <div className="absolute left-0 top-0 aspect-[1100/1556] w-[78%] -rotate-[3deg] overflow-hidden rounded-2xl border border-line bg-white shadow-2xl shadow-black/30 transition-transform duration-700 ease-out-expo group-hover:-translate-y-2 group-hover:rotate-0">
+              <Image src="/cv/preview-1.webp" alt={`${tr("cv.previewAlt", lang)} 1`} fill sizes="(min-width: 1024px) 30vw, 70vw" className="object-cover" />
+            </div>
+          </a>
+        </div>
       </div>
     </Section>
   );

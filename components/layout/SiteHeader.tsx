@@ -127,6 +127,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
               <li key={section.id} className="relative">
                 <a
                   href={`#${section.id}`}
+                  data-scramble
                   aria-current={active === section.id ? "location" : undefined}
                   className={`block rounded-full px-3.5 py-1.5 text-sm transition-colors duration-300 xl:px-4 ${
                     active === section.id ? "text-fg" : "text-muted hover:text-fg"

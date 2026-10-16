@@ -31,6 +31,7 @@ export function MobileMenu({ lang, className = "" }: { lang: Lang; className?: s
       <dialog
         ref={dialogRef}
         aria-label={tr("nav.menu", lang)}
+        data-lenis-prevent
         className="sheet m-0 h-dvh w-screen bg-bg"
         onClick={(event) => {
           // A tap on the backdrop area (the dialog itself, not its content) closes it.

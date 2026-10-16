@@ -15,11 +15,11 @@ export function Certifications({ lang, index }: { lang: Lang; index: number }) {
     >
       <div data-reveal className="mb-10 flex flex-wrap gap-x-12 gap-y-4">
         <p className="flex items-baseline gap-3">
-          <span className="font-display text-6xl font-bold tracking-[-0.04em] text-accent tabular-nums">{certifications.length}</span>
+          <span data-count={certifications.length} className="font-display text-6xl font-bold tracking-[-0.04em] text-accent tabular-nums">{certifications.length}</span>
           <span className="text-muted">{tr("certifications.credentials", lang)}</span>
         </p>
         <p className="flex items-baseline gap-3">
-          <span className="font-display text-6xl font-bold tracking-[-0.04em] text-fg tabular-nums">{activeIssuers.length}</span>
+          <span data-count={activeIssuers.length} className="font-display text-6xl font-bold tracking-[-0.04em] text-fg tabular-nums">{activeIssuers.length}</span>
           <span className="text-muted">{tr("certifications.issuers", lang)}</span>
         </p>
       </div>

@@ -42,7 +42,7 @@ export function Hero({ lang }: { lang: Lang }) {
         </div>
 
         <div className="relative">
-          <p className="reveal font-mono text-xs uppercase tracking-[0.25em] text-accent sm:text-sm" style={delay(0)}>
+          <p data-scramble className="reveal font-mono text-xs uppercase tracking-[0.25em] text-accent sm:text-sm" style={delay(0)}>
             {tr("hero.eyebrow", lang)}
           </p>
 
@@ -55,7 +55,7 @@ export function Hero({ lang }: { lang: Lang }) {
             style={delay(450)}
           >
             <div className="max-w-2xl">
-              <p className="font-display text-2xl font-medium leading-tight tracking-tight text-fg sm:text-3xl">
+              <p data-scramble className="font-display text-2xl font-medium leading-tight tracking-tight text-fg sm:text-3xl">
                 {lead}{" "}
                 <span className="[color:color-mix(in_oklch,var(--accent)_calc(var(--p,0)*100%),var(--fg))]">
                   {payoff}

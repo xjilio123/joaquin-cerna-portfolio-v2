@@ -67,8 +67,13 @@ export function Projects({ lang, index }: { lang: Lang; index: number }) {
         </div>
       ) : (
         <ul className="grid gap-4 md:grid-cols-2">
-          {projects.map((project) => (
-            <li key={project.id} data-reveal className="flex flex-col gap-4 rounded-3xl border border-line bg-surface p-7">
+          {projects.map((project, i) => (
+            <li
+              key={project.id}
+              data-reveal
+              style={{ top: `calc(6rem + ${i * 1.5}rem)` }}
+              className="flex flex-col gap-4 rounded-3xl border border-line bg-surface p-7 fx:sticky"
+            >
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">{project.year}</p>
               <h3 className="font-display text-2xl font-semibold tracking-tight text-fg">{t(project.title, lang)}</h3>
               <p className="text-muted">{t(project.summary, lang)}</p>

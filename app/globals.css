@@ -157,6 +157,28 @@
   mix-blend-mode: normal;
 }
 
+/* ── Smooth scroll (Lenis) ─────────────────────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+/* Lenis eases the scroll itself; a CSS smooth scroll on top would fight it. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* "fx" variant: only while the motion layer is running (never with reduced motion). */
+@custom-variant fx (html[data-motion] &);
+
 /* ── Entrance choreography ─────────────────────────────────────────────────
  * Hidden only while the intro is pending, revealed once <html> gains
  * data-ready. Without JavaScript neither attribute exists, so nothing hides.
@@ -353,4 +375,9 @@ dialog[open] .menu-link {
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
+}
+
+/* Bio words start dim only while the motion layer is running. */
+html[data-motion] [data-scrub] .scrub-word {
+  opacity: 0.16;
 }

@@ -34,8 +34,15 @@ export function About({ lang, index }: { lang: Lang; index: number }) {
           <p data-reveal className="font-display text-[clamp(1.75rem,3.4vw,3rem)] font-medium leading-[1.12] tracking-[-0.02em] text-fg">
             {t(profile.bioLead, lang)}
           </p>
-          <p data-reveal style={delay(100)} className="mt-8 max-w-3xl text-lg leading-relaxed text-muted">
-            {t(profile.bio, lang)}
+          {/* Words light up one by one as the paragraph scrolls through (MotionLayer). */}
+          <p data-reveal data-scrub style={delay(100)} className="mt-8 max-w-3xl text-lg leading-relaxed text-fg">
+            {t(profile.bio, lang)
+              .split(" ")
+              .map((word, i) => (
+                <span key={i} className="scrub-word">
+                  {word}{" "}
+                </span>
+              ))}
           </p>
 
           {/* Stats derived from the data, so they can never overstate the record. */}
@@ -43,7 +50,10 @@ export function About({ lang, index }: { lang: Lang; index: number }) {
             {stats.map((stat, i) => (
               <div key={stat.id} data-reveal style={delay(i * 80)} className="flex flex-col gap-2 bg-bg p-5 sm:p-6">
                 <dt className="order-2 text-sm text-fg">{t(stat.label, lang)}</dt>
-                <dd className="order-1 font-display text-5xl font-bold tracking-[-0.04em] text-accent tabular-nums">
+                <dd
+                  data-count={typeof stat.value === "number" ? stat.value : undefined}
+                  className="order-1 font-display text-5xl font-bold tracking-[-0.04em] text-accent tabular-nums"
+                >
                   {stat.value}
                 </dd>
                 {stat.note ? <dd className="order-3 text-xs text-muted">{t(stat.note, lang)}</dd> : null}

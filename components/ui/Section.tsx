@@ -12,6 +12,8 @@ export function Section({
   intro,
   children,
   className = "",
+  headerClassName = "mb-14 lg:mb-20",
+  ...rest
 }: {
   id: string;
   index: number;
@@ -20,20 +22,23 @@ export function Section({
   intro?: string;
   children: ReactNode;
   className?: string;
-}) {
+  headerClassName?: string;
+} & Record<`data-${string}`, string | boolean>) {
   return (
     <section
       id={id}
       aria-labelledby={`${id}-title`}
       className={`scroll-mt-20 border-t border-line px-5 py-24 sm:px-8 lg:px-16 lg:py-36 ${className}`}
+      {...rest}
     >
-      <header data-reveal className="mb-14 grid gap-5 lg:mb-20 lg:grid-cols-12">
-        <p className="font-mono text-xs uppercase tracking-[0.25em] text-accent sm:text-sm lg:col-span-3 lg:pt-4">
+      <header data-reveal className={`grid gap-5 lg:grid-cols-12 ${headerClassName}`}>
+        <p data-scramble className="font-mono text-xs uppercase tracking-[0.25em] text-accent sm:text-sm lg:col-span-3 lg:pt-4">
           {String(index).padStart(2, "0")} / {eyebrow}
         </p>
         <div className="lg:col-span-9">
           <h2
             id={`${id}-title`}
+            data-scramble
             className="font-display text-[clamp(2.75rem,6.5vw,6rem)] font-bold leading-[0.95] tracking-[-0.04em] text-fg"
           >
             {title}

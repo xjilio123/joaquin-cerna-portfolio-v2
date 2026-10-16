@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
 import type { Lang } from "@/content/types";
 import { LOCALES, tr } from "@/lib/i18n";
+import { flagLanguageSwitch } from "@/lib/scroll";
 
 /**
  * ES / EN switch. Each language has its own URL (/es, /en) so search engines
@@ -21,6 +22,7 @@ export function LangToggle({ lang }: { lang: Lang }) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
     event.preventDefault();
     if (target === lang) return;
+    flagLanguageSwitch();
     router.push(hrefFor(target) + window.location.hash, { scroll: false });
   }
 
