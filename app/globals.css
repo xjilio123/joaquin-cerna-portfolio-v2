@@ -421,11 +421,12 @@ dialog.sheet[open]::backdrop {
 }
 
 /* Command palette: a non-modal dialog that covers the screen and draws its
-   own backdrop (see CommandPalette for why it is not modal). */
+   own backdrop (see CommandPalette for why it is not modal). The backdrop is
+   a plain veil, no backdrop-filter: a full-screen blur made the GPU drop
+   frames on open. Short, transform/opacity-only entrance so it feels instant. */
 dialog.palette {
   border: 0;
-  background: color-mix(in oklch, var(--bg) 60%, transparent);
-  backdrop-filter: blur(8px);
+  background: color-mix(in oklch, var(--bg) 80%, transparent);
 }
 
 dialog.palette:focus-visible {
@@ -433,11 +434,15 @@ dialog.palette:focus-visible {
 }
 
 dialog.palette[open] {
-  animation: fade-in 240ms ease-out;
+  animation: fade-in 140ms ease-out;
 }
 
 dialog.palette[open] .palette-panel {
-  animation: sheet-in 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: palette-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes palette-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.985); }
 }
 
 @keyframes sheet-in {
